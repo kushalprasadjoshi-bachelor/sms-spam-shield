@@ -1,0 +1,86 @@
+############################################
+# General OS / Editor Files
+############################################
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Linux / backups
+*~
+*.bak
+*.tmp
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+############################################
+# LaTeX Temporary / Build Files
+############################################
+
+# Core auxiliary files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.brf
+*.dvi
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.log
+*.nlo
+
+# LaTeX build directories
+build/
+out/
+latex-build/
+
+
+############################################
+# LaTeX Editors
+############################################
+
+# TeXstudio
+*.txss
+*.txsauto
+
+
+############################################
+# Jupyter Notebooks
+############################################
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Temporary notebook files
+*.nbconvert.ipynb
+
+
+############################################
+# Git
+############################################
+
+# Merge conflict leftovers
+*.orig
+
+############################################
+# VS Code Temporary Files
+############################################
+tempCodeRunnerFile.*
