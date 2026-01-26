@@ -39,7 +39,29 @@
 \input{../common/acknowledgement} % Acknowledgement
 
 \input{../common/contents} % Table of Contents, Figures, Tables
-% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------------------------
+
+% ------------------- MAIN CONTENTS ---------------------------------
+% Set page numbering to arabic numerals (right-aligned) for main content
+\clearpage
+\pagenumbering{arabic}
+\input{../common/mainbody_setup}
+\pagestyle{fancy}
+
+\input{../common/chapters/introduction}
+\input{../common/chapters/literature_review}
+% ------------------------------------------------------------------------------------------------
+
+% ------------------- BACK MATTERS ---------------------------------
+% Supress page numbering for back matter
+\clearpage
+\pagenumbering{gobble}
+\pagestyle{plain}
+
+\input{../common/glossary} % Glossary
+
+\addcontentsline{toc}{chapter}{REFERENCES} % Add "REFERENCES" to TOC
+\bibliography{../common/references} % References
 
 \end{document}
 % ===============================================================================================

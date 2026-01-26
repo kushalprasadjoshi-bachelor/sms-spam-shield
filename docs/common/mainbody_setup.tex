@@ -1,0 +1,25 @@
+% ------------------ HEADER AND FOOTER FORMATTING -----------------------
+\fancyhf{}  % Clear all default header/footer settings
+
+% Header - Right side
+\fancyhead[R]{%
+  \textit{\Project{}}
+}
+
+% Footer - Right side
+\fancyfoot[R]{\thepage}   % Page number at bottom-center
+
+% Header and Footer line settings
+\renewcommand{\headrulewidth}{0pt} % No line below header
+\renewcommand{\footrulewidth}{0pt}   % No line above footer
+
+% Apply the same style to chapter opening pages
+% (LaTeX uses 'plain' style for chapters by default)
+% Use no header for chapter opening pages
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[R]{\thepage}
+
+  \renewcommand{\footrulewidth}{0pt}
+}
+% ----------------------------------------------------------------------------------------------

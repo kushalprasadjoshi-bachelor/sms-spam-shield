@@ -1,0 +1,83 @@
+% --------------------- INTRODUCTION -------------------------------
+\chapter{INTRODUCTION}%
+\label{chap:introduction}
+
+% Background and Motivation
+\section{BACKGROUND AND MOTIVATION}
+
+Short Message Service (SMS) remains one of the most widely used communication mediums due to its 
+simplicity, low cost, and universal availability across mobile devices. However, this widespread 
+adoption has also made SMS an attractive channel for unsolicited and malicious messages, including 
+spam, phishing attempts, and fraudulent promotions. Traditional SMS filtering solutions often 
+focus on binary classification: labeling messages as either spam or legitimate; which is 
+increasingly insufficient in modern threat landscapes~\cite{almeida2011contributions}.
+
+Recent advances in machine learning have enabled more accurate text classification techniques, 
+yet most deployed systems operate as black boxes, offering limited insight into why a particular 
+message was flagged. This lack of transparency raises concerns regarding trust, accountability, 
+and regulatory compliance, especially when automated systems influence user 
+communication~\cite{sommerville2011software}. These challenges motivate the development of an 
+intelligent, transparent, and multi-category SMS spam detection system.
+
+% Problem Statement
+\section{PROBLEM STATEMENT}
+
+Existing SMS spam detection systems suffer from three primary limitations:
+\begin{enumerate}
+    \item \textbf{Binary classification constraint:} Most systems classify SMS messages only as 
+        spam or non-spam, failing to distinguish between different spam categories such as 
+        phishing, promotional, or scam messages.
+
+    \item \textbf{Limited explainability:} Users and administrators are rarely provided with 
+        understandable explanations for classification decisions, reducing trust in automated 
+        filtering systems.
+
+    \item \textbf{Model rigidity:} Single-model approaches struggle to generalize across diverse 
+        message structures and evolving spam patterns~\cite{dietterich2000ensemble}.
+\end{enumerate}
+\enumitemEndSpacing{}
+
+Therefore, there is a need for a robust SMS filtering system that supports multi-category classification 
+while providing interpretable and explainable outputs.
+
+% Project Objectives
+\section{PROJECT OBJECTIVES}
+
+The primary objective of this project is to design and implement \textbf{\Project{}}, 
+an explainable and extensible SMS classification system. 
+
+The specific objectives are:
+\begin{itemize}
+    \item To collect and preprocess SMS data suitable for multi-category classification.
+    \item To extract meaningful textual features using statistical and sequential representations.
+    \item To train and evaluate multiple machine learning and deep learning models, including Logistic Regression, Naive Bayes, Support Vector Machines, and Recurrent Neural Networks.
+    \item To design an ensemble-based result aggregation mechanism for improved prediction robustness~\cite{dietterich2000ensemble}.
+    \item To integrate XAI techniques that provide human-interpretable explanations for each prediction~\cite{ribeiro2016why, lundberg2017unified}.
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Scope of the Project
+\section{SCOPE OF THE PROJECT}
+
+The scope of this project includes:
+\begin{itemize}
+    \item SMS messages written in the English language.
+    \item Offline model training and evaluation using publicly available datasets.
+    \item Explainability at the word or token level for classification decisions.
+\end{itemize}
+\enumitemEndSpacing{}
+
+The project does not address multilingual SMS detection, real-time telecom network deployment, 
+or encrypted message platforms.
+
+% Significance of the Project
+\section{SIGNIFICANCE OF THE PROJECT}
+
+By combining ensemble learning with explainable AI techniques, this project aims to improve both 
+the accuracy and transparency of SMS spam detection systems. The proposed solution benefits:
+\begin{itemize}
+    \item \textbf{End users}, by providing understandable reasons for message blocking.
+    \item \textbf{System administrators}, by enabling debugging and model auditing.
+    \item \textbf{Researchers}, by offering a modular framework for experimenting with hybrid models and XAI techniques.
+\end{itemize}
+\enumitemEndSpacing{}

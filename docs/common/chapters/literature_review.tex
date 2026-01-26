@@ -1,0 +1,120 @@
+% ------------------------- LITERATURE REVIEW --------------------------------
+\chapter{LITERATURE REVIEW}%
+\label{chap:literature_review}
+
+“SMS spam detection has evolved from rule-based systems to data-driven and explainable machine learning approaches.”
+
+% Overview of SMS Spam Detection
+\section{OVERVIEW OF SMS SPAM DETECTION}
+
+SMS spam detection has been an active research area due to the increasing misuse of mobile 
+communication channels for unsolicited and fraudulent activities. Early approaches relied heavily 
+on rule-based systems and manually crafted keyword filters. Although effective for simple spam 
+patterns, such systems lacked adaptability and failed to generalize against evolving spam 
+strategies~\cite{almeida2011contributions}.
+
+With the growth of labeled SMS datasets, machine learning-based text classification techniques 
+became the dominant approach. These systems leverage statistical properties of text to learn 
+discriminative patterns between legitimate and malicious messages.
+
+% Traditional Machine Learning Approaches
+\section{TRADITIONAL MACHINE LEARNING APPROACHES}
+
+% Naive Bayes Classifier
+\subsection{Naive Bayes Classifier}
+
+The Naive Bayes (NB\nomenclature{NB}{Naive Bayes}) classifier is one of the most widely used 
+algorithms for text classification due to its simplicity and computational efficiency. It assumes 
+conditional independence between words given the class label. Despite this strong assumption, 
+Naive Bayes has shown competitive performance in SMS spam filtering tasks, particularly when 
+combined with bag-of-words or TF-IDF~\nomenclature{TF-IDF}{Term Frequency-Inverse Document Frequency} 
+representations~\cite{mcCallum1998comparison}.
+
+However, NB models are limited in capturing contextual relationships between words, which restricts 
+their effectiveness in detecting sophisticated spam messages such as phishing attempts.
+
+% Logistic Regression
+\subsection{Logistic Regression}
+
+Logistic Regression (LR\nomenclature{LR}{Logistic Regression}) is a discriminative linear model 
+commonly applied in binary and multi-class text classification. It estimates class probabilities 
+directly and is less sensitive to irrelevant features when regularization is applied. LR-based 
+spam filters have demonstrated stable and interpretable performance in SMS classification 
+tasks~\cite{almeida2011contributions}.
+
+The linear nature of Logistic Regression limits its ability to model non-linear patterns inherent 
+in complex spam messages.
+
+% Support Vector Machines
+\subsection{Support Vector Machines}
+
+Support Vector Machines (SVMs) are margin-based classifiers 
+that aim to maximize the separation between classes. SVMs have been extensively used for spam 
+detection due to their robustness in high-dimensional feature spaces~\cite{cortes1995support}. 
+When combined with TF-IDF features, SVMs often outperform simpler probabilistic models.
+
+Despite their effectiveness, SVMs suffer from high computational cost during training and lack 
+inherent probabilistic interpretability, which poses challenges for explainability.
+
+% Deep Learning Approaches for SMS Classification
+\section{DEEP LEARNING APPROACHES FOR SMS CLASSIFICATION}
+
+% Recurrent Neural Networks
+\subsection{Recurrent Neural Networks}
+
+Recurrent Neural Networks (RNNs) are designed to model sequential data by maintaining temporal 
+dependencies across inputs. In the context of SMS classification, RNNs capture word order and 
+contextual information that traditional bag-of-words models ignore.
+
+Long Short-Term Memory (LSTM) networks address the vanishing gradient problem in standard RNNs 
+and have demonstrated improved performance in text classification tasks~\cite{hochreiter1997long}. 
+However, deep learning models require larger datasets and are often criticized for their 
+black-box behavior.
+
+% Ensemble Learning Techniques
+\section{ENSEMBLE LEARNING TECHNIQUES}
+
+Ensemble learning combines multiple models to improve generalization and robustness. Techniques 
+such as voting, averaging, and stacking leverage the strengths of individual classifiers while 
+mitigating their weaknesses~\cite{dietterich2000ensemble}. In spam detection, ensemble models have 
+been shown to outperform single-model approaches, particularly when datasets contain diverse 
+message patterns.
+
+This project adopts an ensemble-inspired strategy by aggregating predictions from classical and 
+deep learning models.
+
+% Explainable Artificial Intelligence (XAI)
+\section{EXPLAINABLE ARTIFICIAL INTELLIGENCE (XAI)}
+
+% Need for Explainability
+\subsection{Need for Explainability}
+
+As machine learning systems increasingly influence user-facing decisions, explainability has become a 
+critical requirement. Black-box models undermine user trust and complicate debugging, auditing, 
+and regulatory compliance~\cite{sommerville2011software}.
+
+% Model-Agnostic Explanation Techniques
+\subsection{Model-Agnostic Explanation Techniques}
+
+Local Interpretable Model-agnostic Explanations (LIME) generate local surrogate models to explain 
+individual predictions by approximating the decision boundary around a specific 
+instance~\cite{ribeiro2016why}. Similarly, SHAP values provide a unified framework for feature 
+attribution based on cooperative game theory~\cite{lundberg2017unified}.
+
+These techniques are particularly suitable for SMS classification, as they allow token-level 
+interpretation regardless of the underlying model.
+
+% Research Gap and Justification
+\section{RESEARCH GAP AND JUSTIFICATION}
+
+From the reviewed literature, the following gaps are identified:
+\begin{itemize}
+    \item Most existing works evaluate accuracy but do not assess interpretability quality.
+    \item Limited focus on multi-category SMS spam classification.
+    \item Lack of integrated explainability in ensemble-based SMS filters.
+    \item Insufficient emphasis on user-understandable explanations in deployed systems.
+\end{itemize}
+\enumitemEndSpacing{}
+
+The proposed \textbf{\Project{}} addresses these gaps by combining multi-model classification with 
+explainable AI techniques in a unified framework.
