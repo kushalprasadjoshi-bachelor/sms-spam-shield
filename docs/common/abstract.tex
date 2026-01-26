@@ -1,0 +1,33 @@
+% ------------------------- ABSTRACT -------------------------------
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract} % Add to TOC
+
+This project proposes \textbf{\Project{}}, an intelligent and explainable system for 
+classifying SMS~\nomenclature{SMS}{Short Message Service} messages into multiple actionable 
+categories such as \emph{spam, phishing, promotional, transactional, and legitimate} messages. 
+Unlike conventional binary spam filters, the proposed system aims to provide fine-grained 
+classification while offering transparent, human-interpretable explanations for each prediction.
+
+The system is designed to combine classical machine learning models, including Logistic 
+Regression, Naive Bayes, and SVM\nomenclature{SVM}{Support Vector Machine}, with a deep 
+learning-based recurrent neural network 
+(RNN\nomenclature{RNN}{Recurrent Neural Network}/LSTM\nomenclature{LSTM}{Long Short-Term Memory}). 
+An ensemble-based aggregation strategy is employed to improve robustness and generalization across 
+diverse SMS patterns. To address the black-box nature of automated text classifiers, explainable 
+artificial intelligence techniques such as 
+LIME\nomenclature{LIME}{Local Interpretable Model-Agnostic Explanations} and 
+SHAP\nomenclature{SHAP}{SHapley Additive exPlanations} are incorporated to generate token-level 
+explanations and confidence measures for classification decisions.
+
+The project focuses on English-language SMS messages and utilizes offline-trained models evaluated 
+using standard multi-class performance metrics, including precision, recall, F1-score, and 
+confusion matrices. By integrating ensemble learning with explainable 
+AI\nomenclature{AI}{Artificial Intelligence} 
+(XAI\nomenclature{XAI}{Explainable Artificial Intelligence}), the proposed system aims to enhance 
+both the accuracy and transparency of SMS spam detection, benefiting end users, system 
+administrators, and researchers seeking interpretable and trustworthy text classification 
+solutions.
+
+\vspace{2mm}
+\textbf{Keywords:} SMS spam detection, multi-category classification, explainable AI (XAI), 
+ensemble learning, LSTM, LIME, SHAP.\

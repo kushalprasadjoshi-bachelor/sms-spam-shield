@@ -46,6 +46,7 @@ Desktop.ini
 *.snm
 *.log
 *.nlo
+*.nls
 
 # LaTeX build directories
 build/
