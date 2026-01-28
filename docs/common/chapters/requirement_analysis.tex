@@ -1,0 +1,142 @@
+% ------------------------- REQUIREMENT ANALYSIS ------------------------------
+\chapter{REQUIREMENT ANALYSIS}%
+\label{chap:requirement_analysis}
+
+This chapter presents the requirement analysis for the proposed \Project{} system.
+Requirement analysis is a critical phase of the software development lifecycle that focuses on
+identifying, analyzing, and documenting the functional and non-functional requirements of the
+system. A clear understanding of system requirements ensures that the developed solution meets
+user expectations, remains feasible, and achieves its intended objectives.
+
+\section{FEASIBILITY STUDY}
+
+A feasibility study was conducted to evaluate the practicality and viability of the proposed
+system before development. The study considers technical, economic, operational, and time
+feasibility aspects.
+
+\subsection{Technical Feasibility}
+The proposed system is technically feasible as it relies on well-established machine learning
+and deep learning techniques. The required tools, libraries, and frameworks such as Python,
+scikit-learn, TensorFlow, and explainability libraries are freely available and widely supported.
+The computational requirements are moderate and can be fulfilled using standard personal
+computing hardware.
+
+\subsection{Economic Feasibility}
+The system is economically feasible since it uses open-source software tools and publicly
+available datasets. No proprietary software or paid services are required, minimizing overall
+development costs.
+
+\subsection{Operational Feasibility}
+The system is designed to be user-friendly and does not require extensive technical expertise
+to operate. The classification results and explanations are presented in an understandable
+format, ensuring acceptance by end users and stakeholders.
+
+\subsection{Time Feasibility}
+The project is feasible within the given academic timeline. The use of an incremental
+development model allows the system to be developed in stages, ensuring timely completion
+of each module.
+
+\section{FUNCTIONAL REQUIREMENTS}
+
+Functional requirements describe the specific functionalities and services that the proposed
+system must provide. The key functional requirements of the system are as follows:
+\begin{itemize}
+    \item The system shall allow users to submit SMS messages and view predictions in real time using web interface.
+    \item The system shall preprocess input messages using tokenization, stop-word removal,
+          and lemmatization techniques.
+    \item The system shall extract textual features using Bag-of-Words and TF-IDF methods.
+    \item The system shall classify SMS messages into multiple categories such as legitimate,
+          promotional spam, and phishing messages.
+    \item The system shall implement classical machine learning classifiers including Naive
+          Bayes, Logistic Regression, and Support Vector Machine.
+    \item The system shall support deep learning models such as Recurrent Neural Networks
+          or Long Short-Term Memory networks.
+    \item The system shall aggregate predictions from multiple models using an ensemble
+          strategy.
+    \item The system shall generate explainable outputs using model-agnostic explanation
+          techniques such as LIME and SHAP.\
+    \item The system shall display classification results along with token-level explanations.
+    \item The system shall allow inference on previously unseen SMS messages.
+\end{itemize}
+\enumitemEndSpacing{}
+
+\section{NON-FUNCTIONAL REQUIREMENTS}
+
+Non-functional requirements define the quality attributes and performance constraints of the
+system. The following non-functional requirements are identified:
+
+\subsection{Performance Requirements}
+The system shall classify SMS messages with acceptable response time suitable for real-time
+or near real-time usage.
+
+\subsection{Accuracy and Reliability}
+The system shall provide consistent and reliable classification results across different SMS
+categories with minimal classification errors.
+
+\subsection{Usability Requirements}
+The system interface shall be simple and intuitive, allowing users to easily input messages
+and understand the output and explanations without prior training.
+
+\subsection{Scalability Requirements}
+The system shall be capable of handling an increasing number of SMS messages without
+significant degradation in performance.
+
+\subsection{Security Requirements}
+The system shall ensure that input SMS data is processed securely and is not stored or shared
+without authorization.
+
+\subsection{Maintainability Requirements}
+The system shall be modular in design, allowing easy updates, model replacement, and
+extension of functionality in future iterations.
+
+\subsection{Portability Requirements}
+The system shall be portable and capable of running on different operating systems such as
+Windows and Linux with minimal configuration changes.
+
+\section{Hardware Requirements}
+
+The minimum hardware requirements for implementing the proposed system are:
+\begin{itemize}
+    \item Processor: Intel Core i5 or equivalent
+    \item RAM\texttt{:} Minimum 8 GB
+    \item Storage: Minimum 10 GB free disk space
+    \item Optional GPU support for deep learning model training
+\end{itemize}
+\enumitemEndSpacing{}
+
+\section{Software Requirements}
+
+The software requirements for the proposed system are as follows:
+\begin{itemize}
+    \item Operating System: Windows / Linux / MacOS
+    \item Programming Language: Python (version 3.x)
+    \item Development Environment: Jupyter Notebook or any Python IDE (VS code)
+    \item Frontend Technologies: HTML, CSS, and JavaScript
+    \item Backend Framework: Flask or equivalent Python web framework
+\end{itemize}
+\enumitemEndSpacing{}
+
+\section{Tools, Libraries, and Environment}
+
+The following tools and libraries are used in the development of the system:
+\begin{itemize}
+    \item HTML and CSS for designing the web-based user interface
+    \item JavaScript for client-side interactivity
+    \item Flask for integrating the frontend with the backend
+    \item NumPy and Pandas for data manipulation
+    \item Scikit-learn for classical machine learning models
+    \item TensorFlow (KerasAPI) for deep learning models
+    \item NLTK for text preprocessing
+    \item LIME for local interpretability
+    \item SHAP for global and local model explanations
+    \item Matplotlib and Seaborn for visualization
+\end{itemize}
+\enumitemEndSpacing{}
+
+\section{Summary}
+
+This chapter presented the requirement analysis of the proposed \Project{} system. It discussed the feasibility of the project, identified functional and non-functional
+requirements, and specified the necessary hardware, software, tools, and libraries. A clear
+definition of these requirements provides a strong foundation for the subsequent design,
+implementation, and evaluation phases of the project.
+% -----------------------------------------------------------------------------------------------
