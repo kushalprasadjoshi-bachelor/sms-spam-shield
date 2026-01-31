@@ -1,0 +1,104 @@
+% -------------- RISK ANALYSIS AND MITIGATION --------------
+\chapter{RISK ANALYSIS AND MITIGATION}%
+\label{chap:risk_analysis_and_mitigation}
+
+% Introuction to Risk Analysis and Mitigation
+\section{INTRODUCTION}
+
+Risk analysis is a critical component of the Software Development Life Cycle (SDLC) that 
+identifies potential uncertainties which may negatively impact project objectives. Early 
+identification and mitigation of risks improves project reliability and success 
+rate~\cite{sommerville2011software}. This chapter discusses the major risks associated with the 
+development of the proposed SMS Spam Shield system and outlines appropriate mitigation strategies.
+
+%Risk Identification
+\section{RISK IDENTIFICATION}
+
+The risks identified in this project are categorized into technical, data-related, operational, and ethical risks.
+
+% Technical Risks
+\subsection{Technical Risks}
+
+Technical risks pertain to challenges in model development, integration, and performance:
+\begin{itemize}
+    \item \textbf{Model performance degradation:} Trained models may fail to generalize to unseen SMS patterns.
+    \item \textbf{Overfitting:} Complex models such as LSTM may overfit limited datasets.
+    \item \textbf{System integration issues:} Difficulty in integrating multiple models and explainability tools.
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Data-Related Risks
+\subsection{Data-Related Risks}
+
+Data-related risks involve issues with the quality and representativeness of the SMS dataset:
+\begin{itemize}
+    \item \textbf{Class imbalance:} Uneven distribution of SMS categories can bias model predictions.
+    \item \textbf{Data quality issues:} Noisy or mislabeled data may degrade classification accuracy.
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Operational Risks
+\subsection{Operational Risks}
+
+Operational risks relate to deployment and maintenance challenges:
+\begin{itemize}
+    \item \textbf{Computational constraints:} Limited hardware resources may restrict model training or inference speed.
+    \item \textbf{Scalability limitations:} The system may not scale efficiently for high message volumes.
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Ethical and Explainability Risks
+\subsection{Ethical and Explainability Risks}
+
+Ethical risks arise from the need for transparency and user trust in automated spam detection:
+\begin{itemize}
+    \item \textbf{Lack of transparency:} Users may distrust automated decisions without clear explanations.
+    \item \textbf{Privacy concerns:} SMS data may contain sensitive personal information.
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Risk Mitigation Strategies
+\section{RISK MITIGATION STRATEGIES}
+
+Table~\ref{table:risk_mitigation} summarizes identified risks and corresponding mitigation approaches.
+
+\begin{table}
+\centering
+\begin{tabular}{|p{3cm}|p{4cm}|p{7cm}|}
+\hline
+\textbf{Risk Category} & \textbf{Identified Risk} & \textbf{Mitigation Strategy} \\
+\hline
+Technical & Model overfitting & Apply cross-validation, regularization, and early stopping techniques \\
+\hline
+Technical & Integration complexity & Adopt modular architecture and incremental integration \\
+\hline
+Data & Class imbalance & Use resampling techniques and class-weighted loss functions \\
+\hline
+Data & Poor data quality & Perform data cleaning and manual verification of samples \\
+\hline
+Operational & Hardware limitations & Optimize models and use lightweight classifiers for inference \\
+\hline
+Operational & Scalability issues & Design stateless inference modules and batch processing \\
+\hline
+Ethical & Lack of transparency & Integrate explainable AI techniques (LIME, SHAP) \cite{ribeiro2016why} \\
+\hline
+Ethical & Privacy concerns & Anonymize data and avoid storing personally identifiable information \\
+\hline
+\end{tabular}
+\caption{Risk Analysis and Mitigation Strategies}%
+\label{table:risk_mitigation}
+\end{table}
+
+% Residual Risk Assesment
+\section{RESIDUAL RISK ASSESMENT}
+
+Despite mitigation measures, some residual risks may remain, particularly due to evolving spam 
+patterns and data drift. These risks are monitored through periodic model retraining and 
+performance evaluation.
+
+% Summary
+\section{SUMMARY}
+
+Effective risk management ensures system robustness, ethical compliance, and long-term sustainability. 
+The integration of explainability mechanisms further reduces user trust-related risks and supports 
+responsible deployment of machine learning systems.

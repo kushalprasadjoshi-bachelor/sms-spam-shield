@@ -1,0 +1,100 @@
+\chapter{TECHNICAL DETAILS}%
+\label{chap:technical_details}
+
+% Overview
+\section{OVERVIEW}
+
+This chapter provides detailed technical specifications for the \textbf{\Project{}} system. 
+It covers the dataset structure, preprocessing methodology, feature extraction techniques, 
+and classification pipeline architecture that form the foundation of the spam detection model.
+
+% Dataset Structure
+\section{DATASET STRUCUTURE}
+
+The SMS dataset used in this project follows a structured tabular format. Each record represents 
+a single SMS message with an associated category label.
+
+\begin{table}
+\centering
+\begin{tabular}{|c|p{5cm}|p{5cm}|}
+\hline
+\textbf{Field Name} & \textbf{Description} & \textbf{Data Type} \\
+\hline
+sms\_id & Unique identifier for SMS & Integer \\
+\hline
+message\_text & Raw SMS content & String \\
+\hline
+category & SMS classification label & Categorical \\
+\hline
+\end{tabular}%
+\caption{SMS Dataset Schema}
+\label{table:dataset_schema}
+\end{table}
+
+% SMS Category Definations
+\section{SMS CATEGORY DEFINATIONS}
+
+The system supports multi-category classification. The primary categories used are:
+\begin{itemize}
+    \item \textbf{Legitimate:} Personal or informational messages
+    \item \textbf{Promotional:} Marketing or advertising messages
+    \item \textbf{Phishing:} Messages attempting to steal sensitive information
+    \item \textbf{Scam/Fraud:} Messages involving financial deception
+    \item \textbf{Transactional:} One-time password (OTP\nomenclature{OTP}{One Time Password}) or service notifications
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Preprocessing Pipeline Pseudocode
+\section{PREPROCESSING PIPELINE PSEUDOCODE}
+
+\begin{verbatim}
+    Input: Raw SMS Text
+    Output: Cleaned Token List
+
+    1. Convert text to lowercase
+    2. Remove punctuation and special characters
+    3. Tokenize text into words
+    4. Remove stop-words
+    5. Apply lemmatization
+    6. Return cleaned tokens
+\end{verbatim}
+
+% Feature Vector Representation
+\section{FEATURE VECTOR REPRESENTATION}
+
+\textbf{TF-IDF Vector Example:}
+\begin{itemize}
+    \item SMS\texttt{:} ``Win a free prize now''
+    \item Extracted Features: [win, free, prize, now]
+    \item TF-IDF Vector: Sparse numerical representation
+\end{itemize}
+\enumitemEndSpacing{}
+
+\textbf{Sequence Encoding Example:}
+\begin{itemize}
+    \item Tokenized SMS\texttt{:} [win, free, prize, now]
+    \item Encoded Sequence: [45, 112, 78, 203]
+    \item Padded Sequence Length: 50
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Sample Input and Output
+\section{SAMPLE INPUT AND OUTPUT}
+
+\textbf{Sample Input SMS:}
+
+``Congratulations! You have won a free gift card. Click the link to claim now.''
+
+\textbf{System Output:}
+\begin{itemize}
+    \item Predicted Category: Phishing
+    \item Confidence Score: 0.94
+    \item Important Tokens: win, free, click, claim
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Additional Notes
+\section{ADDITIONAL NOTES}
+
+All sample data shown in this appendix is anonymized and used solely for academic and experimental 
+purposes. No personally identifiable information is stored or processed by the system.
