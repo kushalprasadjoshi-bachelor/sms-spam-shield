@@ -1,0 +1,330 @@
+% ------------------- METHODOLOGY -------------------------------------
+\chapter{METHODOLOGY}%
+\label{chap:methodology}
+
+% Overview of Methodology
+\section{OVERVIEW OF THE PROPOSED METHODOLOGY}
+
+The methodology of the proposed \textbf{\Project{}} system
+follows a structured and incremental development approach aligned with Software Development
+Life Cycle (SDLC) principles~\cite{sommerville2011software}. The system follows an
+\textbf{incremental model}, where machine learning models are introduced sequentially one at a time and
+integrated progressively into the system.
+
+The complete workflow consists of data acquisition, preprocessing, feature extraction,
+model training, evaluation, result aggregation, and explainability generation. This approach
+ensures modularity, traceability, and ease of validation at each development stage.
+
+The methodology is divided into two major operational phases:
+\begin{itemize}
+    \item \textbf{Training Phase}: Offline dataset preparation, model training, validation,
+    and optimization.
+    \item \textbf{Inference Phase}: Real-time SMS classification, ensemble aggregation,
+    and explanation generation.
+\end{itemize}
+\enumitemEndSpacing{}
+
+Additionally, each increment undergoes \textbf{component testing} to evaluate individual
+model performance, followed by \textbf{system testing} after integrating the new module.
+% -------------------------------------------------
+
+% Incremental Development Model
+\section{INCREMENTAL DEVELOPMENT MODEL}
+
+The Incremental Model is a type of software development life cycle (SDLC)
+model where the system is designed, implemented, and tested incrementally (in small portions or
+modules) rather than developing the entire system at once. Each increment adds functional capabilities
+until the complete system is ready.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\figWidth{}]{increment_development_model.png}
+    \caption{Incremental Development Model of Proposed System}%
+    \label{fig:incremental_development_model}
+\end{figure}
+
+The system follows an incremental development strategy in which one machine learning
+model is added and evaluated per increment. A total of four increments are defined:
+
+\subsection{Increment 1: Logistic Regression}
+
+Logistic Regression is introduced as the baseline model due to its simplicity,
+interpretability, and efficiency. Component testing is performed to evaluate its
+classification accuracy and stability.
+
+\subsection{Increment 2: Naive Bayes}
+
+The Naive Bayes classifier is integrated in the second increment. Its probabilistic
+nature and low computational cost complement Logistic Regression. Component testing
+is conducted before integration.
+
+\subsection{Increment 3: Support Vector Machine}
+
+Support Vector Machine is added to handle high-dimensional feature spaces and improve
+decision boundaries. After component testing, system testing is performed with LR, NB,
+and SVM integrated.
+
+\subsection{Increment 4: Recurrent Neural Network}
+
+A Recurrent Neural Network with Long Short-Term Memory (LSTM) units is introduced in
+the final increment. This model captures sequential dependencies in SMS text and
+enhances performance for complex patterns~\cite{hochreiter1997long}. Full system
+testing is performed after integration.
+
+\subsection{Reason for Incremental Approach}
+
+Each increment consists of:
+\begin{itemize}
+    \item Model implementation and training
+    \item Component-level accuracy testing
+    \item Integration with existing modules
+    \item System-level testing after integration
+\end{itemize}
+\enumitemEndSpacing{}
+
+This strategy allows early validation, controlled complexity growth, and improved fault
+isolation during development.
+% -------------------------------------------------
+
+% System Architecture
+\section{ARCHITECTURE OF PROPOSED SYSTEM}
+
+The system architecture diagram defines the structural organization of software components 
+and their interactions. The architecture is designed to ensure modularity, scalability, and 
+maintainability, following established software engineering principles within the Software Development Life Cycle 
+(SDLC)~\cite{sommerville2011software}.
+
+The overall system is divided into two primary architectural views:
+\begin{itemize}
+    \item \textbf{Model Training Architecture}
+    \item \textbf{Runtime (Inference) Architecture}
+\end{itemize}
+\enumitemEndSpacing{}
+
+This separation allows independent optimization of training workflows and real-time message 
+classification.
+
+% -------------------------------------------------
+% Model Training Architecture
+\section{MODEL TRAINING ARCHITECTURE}
+
+The model training architecture illustrates the workflow used to prepare, train, evaluate, and 
+store machine learning models. This process is performed offline to ensure efficient and stable 
+deployment.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\figWidth{}]{training_architecture.png}
+    \caption{Model Training Architecture of Proposed System}%
+    \label{fig:training_architecture}
+\end{figure}
+
+% SMS Dataset
+\subsection{SMS Dataset}
+
+The system utilizes publicly available SMS datasets containing labeled text messages.
+Originally binary-labeled datasets are extended or re-labeled to support multi-category
+classification such as legitimate, promotional, phishing, scam, and transactional
+messages~\cite{almeida2011contributions}.
+
+Each dataset record consists of:
+\begin{itemize}
+    \item Raw SMS text
+    \item Corresponding class label
+\end{itemize}
+\enumitemEndSpacing{}
+
+The dataset serves as the foundation for supervised learning across all increments.
+
+% Data Preprocessing and Cleaning
+\subsection{Data Preprocessing and Cleaning}
+
+SMS messages often contain noise such as punctuation, numbers, URLs\nomenclature{URL}{Uniform Resource Locator},
+and inconsistent casing. A unified preprocessing pipeline is applied during both training
+and inference to maintain consistency.
+
+The preprocessing steps include:
+\begin{enumerate}
+    \item Conversion to lowercase
+    \item Removal of punctuation and special characters
+    \item Tokenization into individual words
+    \item Stop-word removal
+    \item Lemmatization or stemming
+\end{enumerate}
+\enumitemEndSpacing{}
+
+These steps reduce vocabulary size, remove noise, and improve model generalization~\cite{mcCallum1998comparison}.
+
+% Feature Extraction
+\subsection{Feature Extraction}
+
+Feature extraction transforms preprocessed SMS text into numerical representations
+suitable for machine learning algorithms.
+
+Two separate feature extraction strategies are implemented:
+\begin{enumerate}
+    \item \textbf{Statistical Features:}
+    For classical machine learning models (LR, NB, and SVM), the following representations
+    are used:
+    \begin{itemize}
+        \item Bag-of-Words (BoW)
+        \item Term Frequency-Inverse Document Frequency (TF-IDF)
+    \end{itemize}
+    \enumitemEndSpacing{}
+
+    TF-IDF assigns lower weights to frequent but less informative words, improving
+    classification performance~\cite{almeida2011contributions}.
+
+    \item \textbf{Sequential Features:} 
+    For the deep learning model, SMS messages are encoded as sequences of word indices.
+    Padding and truncation are applied to ensure uniform sequence length. This enables the
+    model to capture word order and contextual dependencies~\cite{hochreiter1997long}.
+\end{enumerate}
+\enumitemEndSpacing{}
+
+This separation allows each model type to operate on suitable feature representations.
+
+% Train-Test Split
+\subsection{Train-Test Split}
+
+The dataset is divided into training and testing subsets to enable unbiased performance evaluation. 
+The training subset is used for model learning, while the testing subset is reserved for 
+inference validation.
+
+The dataset is divided into training and testing subsets using a fixed ratio (e.g., 80:20).
+
+% Model Training
+\subsection{Model Training}
+
+Multiple classifiers are trained independently in each increment:
+\begin{enumerate}
+    \item Logistic Regression
+    \item Naive Bayes
+    \item Support Vector Machine
+    \item Recurrent Neural Network (LSTM)
+\end{enumerate}
+\enumitemEndSpacing{}
+
+Training multiple models improves system robustness and reduces dependency on a single 
+algorithm~\cite{dietterich2000ensemble}.
+
+% Model Evaluation and Optimization
+\subsection{Model Evaluation and Optimization}
+
+Trained models are evaluated using standard classification metrics:
+\begin{enumerate}
+    \item \textbf{Accuracy:} Measures the proportion of correct predictions over total predictions.
+    \[Accuracy = \frac{TP + TN}{TP + TN + FP + FN}\]
+    
+    \item \textbf{Precision:} Measures the proportion of true positives among predicted positives.
+    \[Precision = \frac{TP}{TP + FP}\]
+    
+    \item \textbf{Recall:} Measures the proportion of true positives among actual positives.
+    \[Recall = \frac{TP}{TP + FN}\]
+    
+    \item \textbf{F1-score:} Harmonic mean of precision and recall, balancing both metrics.
+    \[F1 = 2 \times \frac{Precision \times Recall}{Precision + Recall}\]
+    
+    \item \textbf{Confusion Matrix:} A table displaying true positives (TP), true negatives (TN), false positives (FP), and false negatives (FN) across all SMS categories.
+                        \begin{figure}
+                        \centering
+                        \includegraphics[width=0.5\textwidth{}]{confusion_matrix.png}
+                        \caption{Confusion Matrix}%
+                        \label{fig:confusion_matrix}
+                        \end{figure}
+\end{enumerate}
+\enumitemEndSpacing{}
+
+These metrics provide a comprehensive assessment of both component-level and system-level
+performance across SMS categories~\cite{almeida2011contributions}. If performance is unsatisfactory, 
+model parameters are modified and retraining is performed. This feedback loop continues until 
+acceptable results are achieved.
+
+% Model Storage
+\subsection{Model Storage}
+
+Once validated, trained models are serialized and stored for deployment in the runtime system.
+
+% Runtime (Inference) Architecture
+\section{RUNTIME (INFERENCE) ARCHITECTURE}
+
+The runtime architecture describes how incoming SMS messages are processed and classified in 
+real-time or near real-time.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\figWidth{}]{runtime_architecture.png}
+    \caption{Runtime Architecture for SMS Classification and Explainability}%
+    \label{fig:runtime_architecture}
+\end{figure}
+
+% Input SMS Text
+\subsection{Input SMS Text}
+
+The system accepts raw SMS text as input from the user through the provided interface.
+
+% Preprocessing and Feature Extraction
+\subsection{Preprocessing and Feature Extraction}
+
+Incoming messages undergo the same preprocessing and feature extraction steps used during training 
+to maintain consistency.
+
+% Parallel Model Inference
+\subsection{Parallel Model Inference}
+
+The processed SMS is simultaneously passed to all trained models:
+\begin{itemize}
+    \item Logistic Regression Model
+    \item Naive Bayes Model
+    \item SVM Model
+    \item RNN Model
+\end{itemize}
+
+Each model independently generates a probability distribution over the defined SMS categories.
+
+% Result Aggregator
+\subsection{Result Aggregator}
+
+The result aggregator combines outputs from all models using ensemble techniques such as 
+weighted averaging or majority voting. This improves prediction reliability and reduces 
+individual model bias~\cite{dietterich2000ensemble}.
+
+% Predicted Label
+\subsection{Predicted Label}
+
+The aggregated output produces a final predicted SMS category along with confidence scores.
+
+% Explainability Module
+\subsection{Explainability Module}
+
+The explainability module applies XAI techniques to generate human-interpretable explanations 
+for the prediction. Token-level importance values highlight influential words contributing to 
+the decision~\cite{ribeiro2016why, lundberg2017unified}.
+
+To address transparency and trust concerns, explainable artificial intelligence (XAI)
+techniques are integrated into the system.
+
+% Output to User
+\subsection{Output to User}
+
+The final output consists of:
+\begin{itemize}
+    \item Predicted SMS category
+    \item Confidence score
+    \item Explanation highlighting key textual features
+\end{itemize}
+\enumitemEndSpacing{}
+
+This output enhances transparency and user trust in the system.
+
+% Architectural Advantages
+\section{ARCHITECTURAL ADVANTAGES}
+
+The proposed architecture offers:
+\begin{itemize}
+    \item Modular design enabling easy model replacement or extension
+    \item Improved accuracy through ensemble learning
+    \item Transparency through integrated explainability
+    \item Clear separation of training and inference concerns
+\end{itemize}
+\enumitemEndSpacing{}
