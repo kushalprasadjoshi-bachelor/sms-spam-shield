@@ -1,0 +1,132 @@
+% ------------ IMPLEMENTATION PLAN -------------------------
+\chapter{TIME SCHEDULE}%
+\label{chap:time_schedule}
+
+% Project Timeline 
+\section{PROJECT TIMELINE}
+
+The project is planned to be completed over a period of \textbf{eight weeks}. 
+Gnatt Chart in Figure~\ref{fig:gantt_timeline} illustrates the week-wise breakdown of tasks and milestones.
+Table~\ref{table:timeline_deliverables} presents the week-wise implementation schedule and 
+deliverables.
+
+% Gnatt Chart
+\subsection{Gantt Chart}
+
+\begin{figure}
+\centering
+\begin{ganttchart}[
+    hgrid,
+    vgrid,
+    title height=1,
+    title label font=\bfseries,
+    bar label font=\small,
+    bar height=0.7,
+    x unit=0.75cm,
+    y unit chart=0.8cm,
+]{1}{9}
+
+    % Title
+    \gantttitle{9-Week Project Timeline}{9} \\
+
+    % Week numbers
+    \gantttitlelist{1,...,9}{1} \\
+
+    % Tasks aligned with incremental model
+    \ganttbar{Requirement Analysis \& Literature Review}{1}{1} \\
+
+    \ganttbar{Dataset Collection \& Preprocessing}{2}{2} \\
+
+    \ganttbar{Increment 1: Logistic Regression (Implementation \& Testing)}{3}{3} \\
+
+    \ganttbar{Increment 2: Naive Bayes (Integration \& Testing)}{4}{4} \\
+
+    \ganttbar{Increment 3: Support Vector Machine (System Testing)}{5}{5} \\
+
+    \ganttbar{Increment 4: LSTM Model (Full System Integration)}{6}{7} \\
+
+    \ganttbar{Ensemble Aggregation \& Explainability (XAI)}{8}{8} \\
+
+    \ganttbar{Web Interface, Documentation and Final Review}{9}{9} \\
+
+\end{ganttchart}
+\caption{Gantt Chart Representing Incremental Development Model}%
+\label{fig:gantt_timeline}
+\end{figure}
+
+% Detailed Timeline Table
+\subsection{Timeline Deliverables}
+
+\begin{table}
+\centering
+\begin{tabular}{|c|p{6.5cm}|p{6.5cm}|}
+\hline
+\textbf{Week} & \textbf{Activities} & \textbf{Deliverables} \\
+\hline
+Week 1 &
+Requirement analysis and literature survey &
+Problem definition, system objectives, and finalized methodology \\
+\hline
+Week 2 &
+Dataset collection, cleaning, labeling, and preprocessing &
+Cleaned, preprocessed, and ready-to-use SMS dataset \\
+\hline
+Week 3 &
+Increment 1: Logistic Regression implementation, training, and component testing &
+Baseline Logistic Regression model with evaluation results \\
+\hline
+Week 4 &
+Increment 2: Naive Bayes integration, training, and component testing &
+Integrated LR + NB models with comparative performance analysis \\
+\hline
+Week 5 &
+Increment 3: Support Vector Machine implementation and system testing &
+LR, NB, and SVM integrated system with validated metrics \\
+\hline
+Week 6--7 &
+Increment 4: LSTM model implementation, training, and full system testing &
+Complete system with LSTM-based classification \\
+\hline
+Week 8 &
+Ensemble aggregation and explainability (XAI) integration &
+Final ensemble model with explainable outputs \\
+\hline
+Week 9 &
+Web interface, documentation, validation, and final review &
+Final report, results validation, and project submission \\
+\hline
+\end{tabular}
+\caption{Incremental Timeline Deliverables}%
+\label{table:timeline_deliverables}
+\end{table}
+
+% Milestones
+\section{MILESTONES}
+Major project milestones include:
+\begin{itemize}
+    \item Completion of dataset preparation and preprocessing
+    \item Successful training and validation of all classification models
+    \item Integration of ensemble methods and explainability modules
+    \item Comprehensive performance evaluation and validation against benchmarks
+    \item Submission of final documentation and project deliverables
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Deliverables
+\section{DELIVERABLES}
+The final project deliverables encompass:
+\begin{itemize}
+    \item Fully trained SMS classification models with performance metrics
+    \item Explainable prediction outputs for enhanced interpretability
+    \item Comprehensive project documentation detailing methodologies and results
+    \item Web interface for user-friendly spam detection and prediction
+\end{itemize}
+\enumitemEndSpacing{}
+
+% Schedule Feasibility
+\section{SCHEDULE FEASIBILITY}
+
+The proposed schedule is feasible within the allocated timeframe and available resources. 
+Leveraging established machine learning frameworks, parallel development of incremental 
+components, and a modular design reduces implementation risk and supports timely completion. 
+Contingency buffers are incorporated for model tuning and integration.

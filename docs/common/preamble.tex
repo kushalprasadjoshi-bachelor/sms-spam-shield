@@ -177,6 +177,11 @@
   \@dottedtocline{1}{0em}{1.5cm}{#1}{#2}
 }
 
+% Adust spacing in LOT
+\renewcommand{\l@table}[2]{%
+  \@dottedtocline{1}{0em}{1.5cm}{#1}{#2}
+}
+
 % Bibliography formatting
 \bibliographystyle{IEEEtran} % Use IEEE citation style
 \renewcommand{\bibname}{References} % Change the default "Bibliography" heading to "References"
