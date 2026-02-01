@@ -7,20 +7,20 @@
 % Institution: Cosmos College of Management and Technology, Pokhara University
 % Department : Department of Information Communication and Technology (ICT)
 % Course     : Bachelor of Engineering in Computer Engineering, Semester V
-% Purpose    : Submission of project proposal for evaluation
-% Created    : December 30, 2025
+% Purpose    : Submission of project report for evaluation
+% Created    : Janaury 31, 2026
 % ==============================================================================================
 
 \documentclass[12pt, a4paper]{report} % Document class
-\newcommand{\DocumentTypeFlag}{proposal}  % Document type flag
+\newcommand{\DocumentTypeFlag}{report}  % Document type flag
 \newif\ifproposal{}
-\proposaltrue{}       % ← proposal
-% \proposalfalse{}     % ← report
+% \proposaltrue     % ← proposal
+\proposalfalse{}      % ← report
 
 % ---------------------- DOCUMENT SETUP ------------------------------
 % Define document-specific metadata
-\newcommand{\DocumentType}{Proposal}
-\newcommand{\SubmissionDate}{January 18, 2026}
+\newcommand{\DocumentType}{Report}
+\newcommand{\SubmissionDate}{February 6, 2026}
 
 % Include document preamble imports, macros, settings and configurations
 \input{../common/preamble}
@@ -31,13 +31,14 @@
 % -----------------------------------------------------------------------------------------------
 \begin{document}
 \input{../common/title_page} % Title page
-\input{approval} % Approval page
 
 % ------------------- FRONT MATTERS ---------------------------------
 % Set page numbering to roman numerals for front matter
 \clearpage
 \pagenumbering{roman}
-\setcounter{page}{3}
+\setcounter{page}{2}
+
+\include{copyright} % Copyright
 
 \input{../common/abstract} % Abstract
 \input{../common/preface} % Preface
@@ -58,6 +59,8 @@
 \input{../common/chapters/requirement_analysis}
 \input{../common/chapters/methodology}
 \input{../common/chapters/time_schedule}
+
+\include{./chapters/conclusion_and_future_work}
 % ------------------------------------------------------------------------------------------------
 
 % ------------------- BACK MATTERS ---------------------------------
@@ -69,7 +72,6 @@
 % Appendices
 \appendix
 \input{../common/chapters/risk_analysis_and_mitigation}
-\include{./chapters/technical_details}
 
 \input{../common/glossary} % Glossary
 

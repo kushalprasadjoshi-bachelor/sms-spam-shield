@@ -5,10 +5,21 @@
 % Project Timeline 
 \section{PROJECT TIMELINE}
 
-The project is planned to be completed over a period of \textbf{eight weeks}. 
+% Conditional paragraphs
+\ifproposal{}
+% This paragraphs are only rendered in the proposal
+The project is planned to be completed over a period of \textbf{nine weeks}. 
 Gnatt Chart in Figure~\ref{fig:gantt_timeline} illustrates the week-wise breakdown of tasks and milestones.
 Table~\ref{table:timeline_deliverables} presents the week-wise implementation schedule and 
 deliverables.
+\else
+% This paragraphs are only rendered in the report
+% Add your new statements here for the report
+The project has been succesfully completed over a period of \textbf{nine weeks}. 
+Gnatt Chart in Figure~\ref{fig:gantt_timeline} illustrates the week-wise breakdown of tasks and milestones.
+Table~\ref{table:timeline_deliverables} presents the week-wise implementation schedule and 
+deliverables.
+\fi
 
 % Gnatt Chart
 \subsection{Gantt Chart}
@@ -102,6 +113,10 @@ Final report, results validation, and project submission \\
 
 % Milestones
 \section{MILESTONES}
+
+% Conditional paragraphs
+\ifproposal{}
+% This paragraphs are only rendered in the proposal
 Major project milestones include:
 \begin{itemize}
     \item Completion of dataset preparation and preprocessing
@@ -112,8 +127,30 @@ Major project milestones include:
 \end{itemize}
 \enumitemEndSpacing{}
 
+\else
+% This paragraphs are only rendered in the report
+% Add your new statements here for the report
+The key milestones of the project, aligned with the planned timeline, are as follows:
+\begin{itemize}
+    \item Completion of requirement analysis and literature review
+    \item Successful completion of dataset collection, cleaning, and preprocessing
+    \item Implementation and validation of Logistic Regression as the baseline model
+    \item Integration and evaluation of Naive Bayes and Support Vector Machine models
+    \item Full system integration with LSTM-based deep learning model
+    \item Completion of ensemble aggregation and explainability (XAI) integration
+    \item Development of web-based user interface and completion of system validation
+    \item Submission of final project documentation and deliverables
+\end{itemize}
+\enumitemEndSpacing{}
+
+\fi
+
 % Deliverables
 \section{DELIVERABLES}
+
+% Conditional paragraphs
+\ifproposal{}
+% This paragraphs are only rendered in the proposal
 The final project deliverables encompass:
 \begin{itemize}
     \item Fully trained SMS classification models with performance metrics
@@ -123,10 +160,35 @@ The final project deliverables encompass:
 \end{itemize}
 \enumitemEndSpacing{}
 
-% Schedule Feasibility
+\else
+% This paragraphs are only rendered in the report
+% Add your new statements here for the report
+The major deliverables produced during the course of the project include:
+\begin{itemize}
+    \item Cleaned and preprocessed SMS dataset ready for model training
+    \item Individually trained and evaluated classification models (Logistic Regression, Naive Bayes, Support Vector Machine, and LSTM)
+    \item Fully integrated ensemble classification system with explainable predictions
+    \item Performance evaluation results and comparative analysis of all implemented models
+    \item Web-based graphical user interface for SMS spam detection
+    \item Comprehensive project report documenting methodology, implementation, results, and conclusions
+\end{itemize}
+\enumitemEndSpacing{}
+
+\fi
+
+
+% Conditional paragraphs
+\ifproposal{}
+% This paragraphs are only rendered in the proposal
 \section{SCHEDULE FEASIBILITY}
 
 The proposed schedule is feasible within the allocated timeframe and available resources. 
 Leveraging established machine learning frameworks, parallel development of incremental 
 components, and a modular design reduces implementation risk and supports timely completion. 
 Contingency buffers are incorporated for model tuning and integration.
+
+\else
+% This paragraphs are only rendered in the report
+% Add your new statements here for the report
+  
+\fi
