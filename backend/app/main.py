@@ -10,6 +10,7 @@ from backend.app.core.config import settings
 from backend.app.core.logger import logger
 from backend.app.api.v1.endpoints import predict, health
 from backend.app.services.model_manager import model_manager
+from backend.app.api.v1.endpoints import predict, health, compare 
 
 # Create FastAPI app
 app = FastAPI(
@@ -41,7 +42,7 @@ templates = Jinja2Templates(directory=templates_path) if os.path.exists(template
 # Include routers
 app.include_router(predict.router, prefix=settings.API_V1_PREFIX)
 app.include_router(health.router, prefix=settings.API_V1_PREFIX)
-
+app.include_router(compare.router, prefix=settings.API_V1_PREFIX)
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend(request: Request):

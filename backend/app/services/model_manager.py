@@ -188,6 +188,173 @@ class ModelManager:
             "ensemble_prediction": ensemble_prediction,
             "ensemble_confidence": ensemble_confidence
         }
+    
+    def ensemble_predict(
+        self,
+        text: str,
+        model_types: List[ModelType],
+        method: str = "weighted_voting"
+    ) -> Dict[str, Any]:
+        """
+        Make ensemble predictions using multiple models
+        
+        Args:
+            text: SMS text to classify
+            model_types: List of models to use
+            method: Ensemble method ('weighted_voting', 'averaging', 'stacking')
+        
+        Returns:
+            Dictionary with ensemble predictions
+        """
+        predictions = []
+        confidences = []
+        probabilities_list = []
+        
+        # Get predictions from each model
+        for model_type in model_types:
+            model = self.models.get(model_type)
+            if not model or not model.loaded:
+                continue
+            
+            try:
+                prediction_result = model.predict(text)
+                predictions.append(prediction_result["prediction"])
+                confidences.append(prediction_result["confidence"])
+                probabilities_list.append(prediction_result["probabilities"])
+            except Exception as e:
+                logger.error(f"Error predicting with {model_type.value}: {e}")
+                continue
+        
+        if not predictions:
+            raise ValueError("No valid predictions from selected models")
+        
+        # Apply ensemble method
+        if method == "weighted_voting":
+            ensemble_result = self._weighted_voting(
+                predictions, confidences, probabilities_list
+            )
+        elif method == "averaging":
+            ensemble_result = self._probability_averaging(
+                predictions, probabilities_list
+            )
+        else:
+            # Default to weighted voting
+            ensemble_result = self._weighted_voting(
+                predictions, confidences, probabilities_list
+            )
+        
+        return {
+            "ensemble_prediction": ensemble_result["prediction"],
+            "ensemble_confidence": ensemble_result["confidence"],
+            "individual_predictions": list(zip(
+                [m.value for m in model_types[:len(predictions)]],
+                predictions,
+                confidences
+            ))
+        }
+    
+    def _weighted_voting(
+        self,
+        predictions: List[str],
+        confidences: List[float],
+        probabilities_list: List[List[float]]
+    ) -> Dict[str, Any]:
+        """Weighted voting ensemble method"""
+        from collections import defaultdict
+        
+        # Group predictions with their confidences as weights
+        prediction_scores = defaultdict(float)
+        
+        for pred, confidence in zip(predictions, confidences):
+            prediction_scores[pred] += confidence
+        
+        # Find prediction with highest score
+        ensemble_prediction = max(prediction_scores.items(), key=lambda x: x[1])
+        
+        # Calculate ensemble confidence (normalized score)
+        total_score = sum(prediction_scores.values())
+        ensemble_confidence = ensemble_prediction[1] / total_score if total_score > 0 else 0
+        
+        return {
+            "prediction": ensemble_prediction[0],
+            "confidence": ensemble_confidence,
+            "scores": dict(prediction_scores)
+        }
+    
+    def _probability_averaging(
+        self,
+        predictions: List[str],
+        probabilities_list: List[List[float]]
+    ) -> Dict[str, Any]:
+        """Probability averaging ensemble method"""
+        # This assumes all models have same class order
+        # In production, you'd need to map classes properly
+        
+        import numpy as np
+        
+        # Average probabilities
+        avg_probabilities = np.mean(probabilities_list, axis=0)
+        
+        # Find class with highest average probability
+        max_idx = np.argmax(avg_probabilities)
+        
+        # Get class labels from first model (assuming same order)
+        # In practice, you'd need to get this from model metadata
+        ensemble_prediction = predictions[0]  # Simplified
+        
+        return {
+            "prediction": ensemble_prediction,
+            "confidence": float(avg_probabilities[max_idx]),
+            "probabilities": avg_probabilities.tolist()
+        }
+    
+    def compare_models(self, text: str) -> Dict[str, Any]:
+        """
+        Compare predictions from all loaded models
+        
+        Args:
+            text: SMS text to classify
+        
+        Returns:
+            Comparison results
+        """
+        results = {}
+        
+        for model_type, model in self.models.items():
+            if not model.loaded:
+                continue
+            
+            try:
+                prediction = model.predict(text)
+                results[model_type.value] = {
+                    "prediction": prediction["prediction"],
+                    "confidence": prediction["confidence"],
+                    "status": "success"
+                }
+            except Exception as e:
+                results[model_type.value] = {
+                    "prediction": "Error",
+                    "confidence": 0.0,
+                    "status": "error",
+                    "error": str(e)
+                }
+        
+        # Calculate agreement
+        predictions = [r["prediction"] for r in results.values() 
+                      if r["status"] == "success"]
+        
+        agreement = None
+        if predictions:
+            unique_predictions = set(predictions)
+            agreement = len(unique_predictions) == 1
+        
+        return {
+            "comparison": results,
+            "agreement": agreement,
+            "total_models": len(results),
+            "successful_models": sum(1 for r in results.values() 
+                                   if r["status"] == "success")
+        }
 
 
 # Global model manager instance

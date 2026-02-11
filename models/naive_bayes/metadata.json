@@ -1,0 +1,20 @@
+{
+  "model_name": "naive_bayes",
+  "training_date": "2026-02-11T15:16:49.366645",
+  "n_samples": 11571,
+  "feature_dimensions": 5000,
+  "parameters": {
+    "alpha": 1.0,
+    "fit_prior": true,
+    "class_prior": [
+      0.33281479560971394,
+      0.33359260219514303,
+      0.33359260219514303
+    ]
+  },
+  "classes": [
+    "legitimate",
+    "phishing",
+    "promotional"
+  ]
+}
