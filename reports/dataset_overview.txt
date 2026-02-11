@@ -10,8 +10,8 @@ SMS DATASET PROCESSING REPORT
 
 📈 CATEGORY DISTRIBUTION
    legitimate: 4825 (86.6%)
-   phishing: 683 (12.3%)
-   promotional: 64 (1.1%)
+   phishing: 666 (12.0%)
+   promotional: 81 (1.5%)
 
 📝 SAMPLE MESSAGES PER CATEGORY
 

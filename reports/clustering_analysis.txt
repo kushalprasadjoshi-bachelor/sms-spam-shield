@@ -9,21 +9,21 @@ CLUSTERING ANALYSIS REPORT
    max_iter: 300
 
 📊 CLUSTER DISTRIBUTION:
-   Cluster 0: 413 messages (55.3%)
-   Cluster 1: 157 messages (21.0%)
-   Cluster 2: 64 messages (8.6%)
-   Cluster 3: 113 messages (15.1%)
+   Cluster 0: 147 messages (19.7%)
+   Cluster 1: 81 messages (10.8%)
+   Cluster 2: 490 messages (65.6%)
+   Cluster 3: 29 messages (3.9%)
 
 🔑 TOP KEYWORDS PER CLUSTER:
 
    Cluster 0:
-     stop, text, free, reply, txt, new, uk, mobile, www, send
+     prize, claim, won, urgent, guaranteed, contact, cash, 1000, holiday, 2000
 
    Cluster 1:
-     ur, cash, txt, 150p, tone, box, po, www, 1000, holiday
+     free, camera, mins, mobile, latest, reply, video, nokia, phone, update
 
    Cluster 2:
-     free, mins, camera, latest, mobile, video, reply, update, orange, 08000930705
+     stop, txt, text, ur, free, www, uk, reply, send, just
 
    Cluster 3:
-     prize, claim, won, urgent, shows, contact, code, guaranteed, valid, 800
+     message, immediately, new, waiting, free, urgent, com, spook, bloomberg, messages

@@ -49,15 +49,15 @@ class DataProcessingPipeline:
         # Note: The dataset has extra commas, so we need to handle that
         try:
             # Read with proper handling of extra commas
-            self.raw_data = pd.read_csv(raw_path, header=None, names=['label', 'sms_text'], sep=',', encoding="latin-1")
+            self.raw_data = pd.read_csv(raw_path, header=None, names=['label', 'message_text'], sep=',', encoding="latin-1")
             
             # Clean the text - remove trailing commas that might have been included
-            self.raw_data['sms_text'] = self.raw_data['sms_text'].apply(
+            self.raw_data['message_text'] = self.raw_data['message_text'].apply(
                 lambda x: re.sub(r',+$', '', str(x)) if pd.notnull(x) else ''
             )
 
             # Remove rows with empty text
-            self.raw_data = self.raw_data[self.raw_data['sms_text'].str.strip() != '']
+            self.raw_data = self.raw_data[self.raw_data['message_text'].str.strip() != '']
             
             print(f"  ✓ Loaded {len(self.raw_data)} messages from {raw_path}")
             print(f"  ✓ Columns: {list(self.raw_data.columns)}")
@@ -81,7 +81,7 @@ class DataProcessingPipeline:
         self.legitimate_data['category'] = 'legitimate'
         
         # Keep only necessary columns
-        self.legitimate_data = self.legitimate_data[['sms_text', 'category']]
+        self.legitimate_data = self.legitimate_data[['message_text', 'category']]
         
         print(f"  ✓ Extracted {len(self.legitimate_data)} legitimate messages")
         
@@ -108,7 +108,7 @@ class DataProcessingPipeline:
         
         # Perform clustering
         cluster_labels, cluster_centers = self.clusterer.fit_predict(
-            self.spam_data['sms_text'].tolist()
+            self.spam_data['message_text'].tolist()
         )
         
         # Add cluster labels to spam data
@@ -171,7 +171,7 @@ class DataProcessingPipeline:
             self.spam_data.loc[self.spam_data['cluster'] == cluster_id, 'category'] = assigned_category
         
         # Keep only necessary columns
-        self.spam_data = self.spam_data[['sms_text', 'category']]
+        self.spam_data = self.spam_data[['message_text', 'category']]
     
     def merge_and_label(self) -> None:
         """
@@ -197,7 +197,7 @@ class DataProcessingPipeline:
         balancer = DatasetBalancer(balance_config)
         
         # Prepare data for balancing
-        X = self.processed_data['sms_text']
+        X = self.processed_data['message_text']
         y = self.processed_data['label_encoded']
         
         # Balance the dataset
@@ -205,7 +205,7 @@ class DataProcessingPipeline:
         
         # Create balanced dataframe
         self.balanced_data = pd.DataFrame({
-            'sms_text': X_balanced,
+            'message_text': X_balanced,
             'category': self.label_encoder.inverse_transform(y_balanced)
         })
         
@@ -228,7 +228,7 @@ class DataProcessingPipeline:
         
         # Save processed data (unbalanced)
         processed_path = Path(paths['processed_data'])
-        self.processed_data[['sms_text', 'category']].to_csv(processed_path, index=False)
+        self.processed_data[['message_text', 'category']].to_csv(processed_path, index=False)
         print(f"  ✓ Saved processed data to {processed_path}")
         
         # Save balanced data
@@ -291,7 +291,7 @@ class DataProcessingPipeline:
             report_lines.append(f"\n   [{category.upper()}]")
             samples = self.processed_data[self.processed_data['category'] == category].head(2)
             for idx, row in samples.iterrows():
-                truncated_text = row['sms_text'][:80] + "..." if len(row['sms_text']) > 80 else row['sms_text']
+                truncated_text = row['message_text'][:80] + "..." if len(row['message_text']) > 80 else row['message_text']
                 report_lines.append(f"   • {truncated_text}")
         
         reports['dataset_overview'] = "\n".join(report_lines)
