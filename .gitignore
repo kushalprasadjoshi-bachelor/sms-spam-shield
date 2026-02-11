@@ -85,3 +85,13 @@ latex-build/
 # VS Code Temporary Files
 ############################################
 tempCodeRunnerFile.*
+/.vscode/
+__pycache__/
+*.pyc
+
+############################################
+# Virtual Environments
+#############################################
+venv/
+env/
+.venv/

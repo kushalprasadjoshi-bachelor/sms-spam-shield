@@ -1,0 +1,28 @@
+============================================================
+SMS DATASET PROCESSING REPORT
+============================================================
+
+📊 DATASET OVERVIEW
+   Total Messages: 5572
+   Legitimate Messages: 4825
+   Spam Messages: 747
+   Categories: 3
+
+📈 CATEGORY DISTRIBUTION
+   legitimate: 4825 (86.6%)
+   phishing: 683 (12.3%)
+   promotional: 64 (1.1%)
+
+📝 SAMPLE MESSAGES PER CATEGORY
+
+   [LEGITIMATE]
+   • Go until jurong point, crazy.. Available only in bugis n great world la e buffet...
+   • Ok lar... Joking wif u oni...
+
+   [PHISHING]
+   • Free entry in 2 a wkly comp to win FA Cup final tkts 21st May 2005. Text FA to 8...
+   • FreeMsg Hey there darling it's been 3 week's now and no word back! I'd like some...
+
+   [PROMOTIONAL]
+   • Had your mobile 11 months or more? U R entitled to Update to the latest colour m...
+   • 07732584351 - Rodger Burns - MSG = We tried to call you re your reply to our sms...

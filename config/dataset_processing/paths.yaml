@@ -1,0 +1,8 @@
+paths:
+  raw_data: "dataset/raw/kaggle_dataset.csv"
+  processed_data: "dataset/processed/processed_dataset.csv"
+  processed_data_balanced: "dataset/processed/processed_dataset_balanced.csv"
+  vectorizer_path: "models/dataset_processing/tfidf_vectorizer.pkl"
+  clusterer_path: "models/dataset_processing/clusterer.pkl"
+  label_encoder_path: "models/dataset_processing/label_encoder.pkl"
+  reports_dir: "reports/"

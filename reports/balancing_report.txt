@@ -1,0 +1,17 @@
+============================================================
+DATASET BALANCING REPORT
+============================================================
+
+📊 BEFORE BALANCING:
+   legitimate: 4825
+   phishing: 683
+   promotional: 64
+
+📊 AFTER BALANCING:
+   legitimate: 4825
+   phishing: 4825
+   promotional: 4825
+
+📈 BALANCING STATISTICS:
+   Total samples added: 8903
+   Balance improvement: 0.00%

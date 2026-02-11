@@ -1,0 +1,9 @@
+balancing:
+  method: "smote"  # Options: smote, random_oversample, adasyn
+  smote:
+    sampling_strategy: "auto"
+    k_neighbors: 5
+    random_state: 42
+  random_oversample:
+    sampling_strategy: "auto"
+    random_state: 42

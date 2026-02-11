@@ -1,0 +1,65 @@
+\chapter{DATASET PROCESSING}%
+\label{chap:dataset_processing}
+
+\section{OVERVIEW}
+
+The dataset processing pipeline plays a crucial role in preparing the raw data for effective model 
+training and evaluation. This chapter outlines the systematic approach employed to transform 
+the original Kaggle dataset into a balanced, well-structured, and representative dataset suitable 
+for machine learning tasks. The entire processing workflow is visually summarized in 
+Figure~\ref{fig:dataset_processing}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{dataset_processing.png}
+    \caption{Dataset processing pipeline showing the workflow from raw data extraction to final processed dataset preparation.}%
+    \label{fig:dataset_processing}
+\end{figure}
+
+\section{DATA SOURCE AND INITIAL EXTRACTION}
+
+The dataset originates from a publicly available Kaggle repository containing email messages 
+labeled as either legitimate (ham) or unsolicited commercial messages (spam). The initial phase 
+involved extracting the raw data files and performing basic cleaning operations, including:
+\begin{itemize}
+    \item Removal of duplicate entries
+    \item Handling of missing values
+    \item Standardization of text encoding
+    \item Basic text normalization (lowercasing, punctuation removal)
+\end{itemize}
+
+\section{LABEL MAPPING AND STRATIFICATION}
+
+Following extraction, the data underwent label mapping where the original class labels were 
+mapped to consistent identifiers: \texttt{"legitimate"} for ham messages and \texttt{"spam"} for 
+unsolicited messages. Label stratification ensured that the class distribution was 
+representative of the original dataset while maintaining the integrity of the categorical 
+labels for subsequent processing steps.
+
+\section{UNSUPERVISED CLUSTERING FOR SPAM ANALYSIS}
+
+An unsupervised clustering approach using K-means algorithm with TF-IDF (Term Frequency-Inverse Document Frequency) 
+vectorization was applied specifically to the spam messages. This process served two purposes:
+\begin{enumerate}
+    \item To identify potential subtypes or patterns within spam messages
+    \item To create more nuanced labeling for the spam category that could potentially improve model discrimination
+\end{enumerate}
+
+The TF-IDF vectorization transformed text into numerical features, while K-means clustering 
+grouped similar spam messages based on their content characteristics.
+
+\section{DATA INTEGRATION AND BALANCING}
+
+The legitimate messages (ham) were merged with the now-labeled spam messages to create a 
+unified dataset. To address potential class imbalance issues that could bias the machine 
+learning models, Synthetic Minority Over-sampling Technique (SMOTE\nomenclature{SMOTE}{Synthetic Minority Over-sampling Technique}) 
+was applied. This algorithm generates synthetic examples of the minority class to achieve a more 
+balanced distribution between legitimate and spam messages.
+
+\section{FINAL PROCESSING STEPS}
+The balanced dataset underwent shuffling to eliminate any ordering artifacts that might affect 
+model training. Finally, the processed dataset was persisted in a structured format (e.g., CSV (here), JSON, or database storage) 
+with appropriate metadata documentation, making it readily accessible for model training and evaluation phases.
+The resulting processed dataset maintained the original content's semantic integrity while 
+providing balanced, well-structured, and consistently labeled data suitable for training robust 
+classification models.

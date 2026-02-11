@@ -1,0 +1,29 @@
+============================================================
+CLUSTERING ANALYSIS REPORT
+============================================================
+
+🔧 CLUSTERING CONFIGURATION:
+   Method: kmeans
+   Number of clusters: 4
+   n_init: 10
+   max_iter: 300
+
+📊 CLUSTER DISTRIBUTION:
+   Cluster 0: 413 messages (55.3%)
+   Cluster 1: 157 messages (21.0%)
+   Cluster 2: 64 messages (8.6%)
+   Cluster 3: 113 messages (15.1%)
+
+🔑 TOP KEYWORDS PER CLUSTER:
+
+   Cluster 0:
+     stop, text, free, reply, txt, new, uk, mobile, www, send
+
+   Cluster 1:
+     ur, cash, txt, 150p, tone, box, po, www, 1000, holiday
+
+   Cluster 2:
+     free, mins, camera, latest, mobile, video, reply, update, orange, 08000930705
+
+   Cluster 3:
+     prize, claim, won, urgent, shows, contact, code, guaranteed, valid, 800

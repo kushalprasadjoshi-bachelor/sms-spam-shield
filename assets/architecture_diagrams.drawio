@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0" version="29.3.6" pages="4">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0" version="29.3.8" pages="5">
   <diagram id="a3k65irpizVTf_wPB-GQ" name="Runtime Architecture">
     <mxGraphModel dx="1418" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -482,6 +482,82 @@
         </mxCell>
         <mxCell id="hpmXx5i0qJFoLocfwI0U-15" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=-90;" value="&lt;span style=&quot;font-size: 20px;&quot;&gt;&lt;b&gt;ACTUAL&lt;/b&gt;&lt;/span&gt;" vertex="1">
           <mxGeometry height="30" width="60" x="220" y="430" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="oNAs0HX2tIW28GDrtTPm" name="Dataset Processing">
+    <mxGraphModel dx="1418" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-26" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="5yuC-MHTAVAUd5u8vGmf-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Data Extraction and Cleaning" vertex="1">
+          <mxGeometry height="40" width="280" x="290" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-2" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" value="Kaggle Dataset" vertex="1">
+          <mxGeometry height="40" width="200" x="330" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-3" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-2" style="endArrow=classic;html=1;rounded=0;exitX=0.455;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.468;entryY=-0.075;entryDx=0;entryDy=0;entryPerimeter=0;" target="5yuC-MHTAVAUd5u8vGmf-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="440" y="410" as="sourcePoint" />
+            <mxPoint x="480" y="70" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Unsupervised Clustering (K-means + TF-IDF)" vertex="1">
+          <mxGeometry height="40" width="280" x="290" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-5" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="5yuC-MHTAVAUd5u8vGmf-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Merge Legitimate and Labeled Spam" vertex="1">
+          <mxGeometry height="40" width="280" x="290" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-10" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="5yuC-MHTAVAUd5u8vGmf-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Dataset Balancing (SMOTE)" vertex="1">
+          <mxGeometry height="40" width="280" x="291" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-15" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-4" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="5yuC-MHTAVAUd5u8vGmf-9" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="410" y="590" as="sourcePoint" />
+            <mxPoint x="460" y="540" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-29" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="5yuC-MHTAVAUd5u8vGmf-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Shuffling and Persistence" vertex="1">
+          <mxGeometry height="40" width="280" x="290" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-30" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="5yuC-MHTAVAUd5u8vGmf-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-33" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="5yuC-MHTAVAUd5u8vGmf-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-34" connectable="0" parent="5yuC-MHTAVAUd5u8vGmf-33" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Spam" vertex="1">
+          <mxGeometry relative="1" x="-0.3" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-25" parent="1" style="rhombus;whiteSpace=wrap;html=1;" value="Label Stratification" vertex="1">
+          <mxGeometry height="90" width="100" x="380" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-27" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" value="Processed Dataset" vertex="1">
+          <mxGeometry height="40" width="200" x="330" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-32" edge="1" parent="1" source="5yuC-MHTAVAUd5u8vGmf-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="5yuC-MHTAVAUd5u8vGmf-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-28" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Map to &quot;legitimate&quot;" vertex="1">
+          <mxGeometry height="40" width="150" x="120" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="5yuC-MHTAVAUd5u8vGmf-31" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="ham" vertex="1">
+          <mxGeometry height="30" width="60" x="290" y="180" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
