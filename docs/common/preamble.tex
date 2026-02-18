@@ -14,6 +14,8 @@
 \usepackage{caption}  % Allows proper captions in floats
 \usepackage{fancyhdr} % Package for custom headers/footers
 \usepackage{etoolbox}  % Needed for conditional logic
+\usepackage{listings}   % For including code snippits
+\usepackage{amsmath}  % For advanced math formatting
 % ==============================================================================================
 
 % ==============================================================================================
@@ -146,6 +148,29 @@
     itemsep=\ITEMSEP\ % Vertical space between individual bullet points
 }
 % ----------------------------------------------------------------------------------------------
+
+% -------------------------- LISTING CONFIGURATIONS ------------------
+% Custom Listing Style
+\lstset{
+    basicstyle=\ttfamily\normalsize, % Monospaced font
+    commentstyle=\color{green!60!black}\itshape,  % Comments in green italics
+    keywordstyle=\color{blue}, % Keywords in blue
+    stringstyle=\color{red}, % Strings in red
+    numbers=left,  % Line numbers
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=5pt,
+    frame=single,  % Box around code
+    breaklines=true, % Automatic line breaks
+    showstringspaces=false,
+    tabsize=4,
+    captionpos=b,  % Captions below code
+    abovecaptionskip=0pt,
+    belowskip=5pt
+}
+
+% % Change the listing name
+\renewcommand{\lstlistingname}{Code} % Changes "Listing" to "Code"
 
 % ---------------------- GRAPHICS CONFIGURATION ---------------------
 % Automatically search for images inside the path defined by \IMGPATH

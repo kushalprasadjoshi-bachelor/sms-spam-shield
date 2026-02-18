@@ -1,0 +1,246 @@
+\chapter{IMPLEMENTATION}%
+\label{chap:implementation}
+
+\section{INTRODUCTION}
+The SMS Spam Shield project was developed using an incremental approach, adding one machine 
+learning model per increment. This chapter details the implementation of each model, 
+including feature engineering, training procedures, hyperparameter tuning, performance 
+evaluation, and testing strategies. The four models implemented are Logistic Regression, 
+Naive Bayes, Support Vector Machine (SVM), and Long Short-Term Memory (LSTM) networks. An 
+ensemble combining all models is also evaluated.
+
+\section{INCREMENT 1: LOGISTIC REGRESSION}
+
+\subsection{Model Overview}
+Logistic Regression serves as the baseline model due to its simplicity, interpretability, and 
+efficiency. For multi-class classification, the softmax function is used:
+
+\[
+P(y=k|\mathbf{x}) = \frac{e^{\mathbf{w}_k^T \mathbf{x} + b_k}}{\sum_{j=1}^{K} e^{\mathbf{w}_j^T \mathbf{x} + b_j}}
+\]
+
+\subsection{Feature Engineering}
+Text preprocessing includes:
+\begin{itemize}
+    \item Conversion to lowercase
+    \item Tokenization
+    \item Stop-word removal
+    \item Lemmatization
+\end{itemize}
+\enumitemEndSpacing{}
+
+Features are extracted using TF-IDF vectorization with unigrams and bigrams, limited to the top 
+5000 features.
+
+\subsection{Training and Hyperparameters}
+The dataset was split into 80\% training and 20\% testing with stratification. Hyperparameters:
+\begin{itemize}
+    \item Regularization strength \(C = 1.0\)
+    \item Solver: \texttt{lbfgs}
+    \item Multi-class: multinomial
+    \item Maximum iterations: 1000
+\end{itemize}
+\enumitemEndSpacing{}
+
+\subsection{Performance Metrics}
+
+\begin{table}
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{Metric} & \textbf{Value} & \textbf{Percentage} \\
+\hline
+Accuracy & 0.921 & 92.1\% \\
+Precision & 0.915 & 91.5\% \\
+Recall & 0.928 & 92.8\% \\
+F1-Score & 0.921 & 92.1\% \\
+\hline
+\end{tabular}
+\caption{Logistic Regression Performance}
+\end{table}
+
+\subsection{Testing}
+
+Unit tests validated preprocessing functions (tokenization, stop-word removal) and ensured the 
+model produced probability outputs. Integration tests verified the API endpoint returned the 
+correct response structure.
+
+\section{INCREMENT 2: NAIVE BAYES}
+
+\subsection{Model Overview}
+Multinomial Naive Bayes is based on Bayes' theorem with the assumption of conditional 
+independence between features:
+\[
+P(y=k|\mathbf{x}) \propto P(y=k) \prod_{i=1}^{n} P(x_i|y=k)
+\]
+
+\subsection{Feature Engineering}
+
+CountVectorizer was used instead of TF-IDF, as Naive Bayes typically operates on word counts. 
+Laplace smoothing with \(\alpha = 1.0\) was applied to handle zero probabilities.
+
+\subsection{Class Priors}
+
+Class priors were calculated from the training data:
+\begin{itemize}
+    \item Legitimate: 0.632
+    \item Promotional: 0.204
+    \item Phishing: 0.098
+    \item Scam: 0.066
+\end{itemize}
+\enumitemEndSpacing{}
+
+\subsection{Performance Metrics}
+
+\begin{table}
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{Metric} & \textbf{Value} & \textbf{Percentage} \\
+\hline
+Accuracy & 0.893 & 89.3\% \\
+Precision & 0.884 & 88.4\% \\
+Recall & 0.901 & 90.1\% \\
+F1-Score & 0.892 & 89.2\% \\
+\hline
+\end{tabular}
+\caption{Naive Bayes Performance}
+\end{table}
+
+\subsection{Testing}
+Unit tests checked that probability distributions sum to one and that Laplace smoothing works 
+correctly. Integration tests compared predictions with Logistic Regression on sample inputs.
+
+\section{INCREMENT 3: SUPPORT VECTOR MACHINE}
+
+\subsection{Model Overview}
+SVM finds the optimal hyperplane that maximizes the margin between classes. With the kernel 
+trick, the decision function becomes:
+\[
+f(x) = \mathrm{sign}\left(\sum_{i} \alpha_i y_i K(x_i, x) + b\right)
+\]
+
+\subsection{Hyperparameter Tuning}
+Grid search with 5-fold cross-validation was performed over:
+\begin{itemize}
+    \item Kernel: linear, RBF, polynomial
+    \item \(C\): 0.1, 1.0, 10.0, 100.0
+    \item \(\gamma\): scale, auto, 0.01, 0.1, 1.0 (for RBF and polynomial)
+    \item Degree: 2, 3, 4 (for polynomial)
+\end{itemize}
+\enumitemEndSpacing{}
+
+The best parameters were kernel = RBF, \(C = 10.0\), \(\gamma = \mathrm{scale}\).
+
+\subsection{Performance Metrics}
+\begin{table}
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{Metric} & \textbf{Value} & \textbf{Percentage} \\
+\hline
+Accuracy & 0.942 & 94.2\% \\
+Precision & 0.940 & 94.0\% \\
+Recall & 0.943 & 94.3\% \\
+F1-Score & 0.941 & 94.1\% \\
+5-Fold CV Score & 0.938 & 93.8\% \\
+\hline
+\end{tabular}
+\caption{SVM Performance (Tuned)}
+\end{table}
+
+\subsection{Explainability with SHAP}
+SHAP (SHapley Additive exPlanations) was integrated to provide token-level explanations. For a 
+given prediction, SHAP values indicate the contribution of each word to the final output. For 
+example, in a phishing SMS, words like ``won'', ``free'', and ``click'' had high positive SHAP 
+values.
+
+\subsection{Testing}
+Unit tests verified label encoding and that probability calibration works (SVM with 
+`probability=True'). Integration tests ensured SHAP explanations were included in API 
+responses.
+
+\section{INCREMENT 4: LSTM WITH ATTENTION}
+
+\subsection{Model Architecture}
+A recurrent neural network with LSTM units and an attention mechanism captures sequential 
+dependencies in SMS text. The LSTM cell equations are:
+\begin{equation*}
+\begin{aligned}
+f_t &= \sigma\!\left(W_f [h_{t-1}; x_t] + b_f \right) \\
+i_t &= \sigma\!\left(W_i [h_{t-1}; x_t] + b_i \right) \\
+\tilde{C}_t &= \tanh\!\left(W_c [h_{t-1}; x_t] + b_c \right) \\
+C_t &= f_t \odot C_{t-1} + i_t \odot \tilde{C}_t \\
+o_t &= \sigma\!\left(W_o [h_{t-1}; x_t] + b_o \right) \\
+h_t &= o_t \odot \tanh(C_t)
+\end{aligned}
+\end{equation*}
+
+The attention layer computes weights over the LSTM output sequence, highlighting important words.
+
+\subsection{Training}
+The LSTM model was trained on padded sequences of token indices. Hyperparameters were tuned using 
+a validation set, resulting in the following configuration:
+\begin{itemize}
+    \item Embedding dimension: 100
+    \item LSTM units: 128
+    \item Dropout: 0.5
+    \item Recurrent dropout: 0.2
+    \item Dense layer: 64 units (ReLU)
+    \item Batch size: 64
+    \item Epochs: 20 with early stopping (patience = 3)
+    \item Optimizer: Adam (learning rate 0.001)
+\end{itemize}
+\enumitemEndSpacing{}
+
+\subsection{Performance Metrics}
+\begin{table}
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{Metric} & \textbf{Value} & \textbf{Percentage} \\
+\hline
+Accuracy & 0.963 & 96.3\% \\
+Precision & 0.961 & 96.1\% \\
+Recall & 0.964 & 96.4\% \\
+F1-Score & 0.962 & 96.2\% \\
+\hline
+\end{tabular}
+\caption{LSTM Performance}
+\end{table}
+
+\subsection{Explainability with Attention}
+Attention weights are extracted from the trained model to provide token-level explanations. 
+Words with the highest attention scores are displayed as important for the prediction.
+
+\subsection{Testing}
+Unit tests validated that the tokenizer correctly maps words to indices and that the attention 
+layer output has the expected shape. Integration tests confirmed that the LSTM endpoint returns 
+attention-based explanations.
+
+\section{ENSEMBLE PERFORMANCE}
+All four models were combined using weighted voting and probability averaging. The ensemble 
+achieved 97.1\% accuracy, outperforming individual models and demonstrating the benefits of 
+diversity in model selection.
+
+\section{TESTING FRAMEWORK}
+\subsection{Unit Testing}
+Unit tests were written for:
+\begin{itemize}
+    \item \textbf{Preprocessing:} Verifying that text cleaning, tokenization, and stop-word removal work correctly on sample inputs.
+    \item \textbf{Model Predictions:} Ensuring each model returns valid probability distributions and class labels.
+    \item \textbf{SHAP/Attention:} Checking that explanation methods produce non-empty outputs with correct formats.
+\end{itemize}
+
+\subsection{Integration Testing}
+Integration tests covered:
+\begin{itemize}
+    \item \textbf{API Endpoints:} Testing `/predict', `/models', `/compare', and `/dashboard' endpoints for correct HTTP status codes and JSON structure.
+    \item \textbf{Model Loading:} Confirming all trained models load without errors during application startup.
+    \item \textbf{End-to-End:} Simulating user SMS input and verifying that the frontend updates correctly.
+\end{itemize}
+
+All tests are automated using the `pytest' framework and can be executed with:
+\begin{lstlisting}[language=bash, caption={Running backend tests using pytest}]
+pytest backend/tests/
+\end{lstlisting}
