@@ -19,26 +19,27 @@ class ModelVersionManager:
         self.versions_dir = self.model_dir / "versions"
         self.versions_dir.mkdir(exist_ok=True)
         
-    def save_version(
-        self,
-        model,
-        vectorizer,
-        metrics: Dict[str, float],
-        params: Dict[str, Any],
-        version: Optional[str] = None
-    ) -> str:
-        """Save a new model version"""
+    def save_version(self, model, vectorizer, metrics: Dict[str, float], params: Dict[str, Any], version: Optional[str] = None) -> str:
         if version is None:
-            # Generate version based on timestamp
             version = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+
         version_dir = self.versions_dir / version
         version_dir.mkdir(exist_ok=True)
-        
-        # Save model and vectorizer
-        joblib.dump(model, version_dir / "model.pkl")
-        joblib.dump(vectorizer, version_dir / "vectorizer.pkl")
-        
+
+        # Save model (handle Keras models differently)
+        import tensorflow as tf
+        if isinstance(model, tf.keras.Model):
+            model.save(version_dir / "model.h5")
+        else:
+            joblib.dump(model, version_dir / "model.pkl")
+
+        # Save vectorizer/tokenizer
+        if hasattr(vectorizer, 'save') and callable(vectorizer.save):
+            # For tokenizers that have a save method (e.g., from transformers)
+            vectorizer.save(str(version_dir / "tokenizer"))
+        else:
+            joblib.dump(vectorizer, version_dir / "vectorizer.pkl")
+
         # Save metadata
         metadata = {
             "version": version,
@@ -48,27 +49,39 @@ class ModelVersionManager:
             "metrics": metrics,
             "is_production": False
         }
-        
         with open(version_dir / "metadata.json", "w") as f:
             json.dump(metadata, f, indent=2)
-        
-        # Also save a copy of metrics and metadata in main directory
+
+        # Also save a copy in main directory
         with open(self.model_dir / "metadata.json", "w") as f:
             json.dump(metadata, f, indent=2)
         with open(self.model_dir / "metrics.json", "w") as f:
             json.dump(metrics, f, indent=2)
-        
+
         logger.info(f"Saved {self.model_name} version {version}")
         return version
     
     def load_version(self, version: str):
-        """Load a specific model version"""
         version_dir = self.versions_dir / version
         if not version_dir.exists():
             raise ValueError(f"Version {version} not found")
         
-        model = joblib.load(version_dir / "model.pkl")
-        vectorizer = joblib.load(version_dir / "vectorizer.pkl")
+        # Check if model is Keras (model.h5 exists) or pickle
+        if (version_dir / "model.h5").exists():
+            model = tf.keras.models.load_model(version_dir / "model.h5")
+        else:
+            model = joblib.load(version_dir / "model.pkl")
+        
+        # Load vectorizer
+        if (version_dir / "vectorizer.pkl").exists():
+            vectorizer = joblib.load(version_dir / "vectorizer.pkl")
+        elif (version_dir / "tokenizer").exists():
+            # Assume tokenizer has a load method (simplified)
+            import pickle
+            with open(version_dir / "tokenizer", 'rb') as f:
+                vectorizer = pickle.load(f)
+        else:
+            vectorizer = None
         
         with open(version_dir / "metadata.json", "r") as f:
             metadata = json.load(f)

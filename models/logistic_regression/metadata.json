@@ -1,6 +1,6 @@
 {
   "model_name": "logistic_regression",
-  "training_date": "2026-02-11T14:10:36.439301",
+  "training_date": "2026-02-17T11:36:30.199067",
   "n_samples": 11571,
   "feature_dimensions": 5000,
   "parameters": {

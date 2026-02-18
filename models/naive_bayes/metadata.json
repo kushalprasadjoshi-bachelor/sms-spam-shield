@@ -1,6 +1,6 @@
 {
   "model_name": "naive_bayes",
-  "training_date": "2026-02-11T15:16:49.366645",
+  "training_date": "2026-02-17T11:36:49.028424",
   "n_samples": 11571,
   "feature_dimensions": 5000,
   "parameters": {
