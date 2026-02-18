@@ -10,4 +10,5 @@ async def get_metrics():
 
 @router.get("/dashboard")
 async def get_dashboard():
+    """Return real-time monitoring data."""
     return monitoring_service.get_dashboard_data()

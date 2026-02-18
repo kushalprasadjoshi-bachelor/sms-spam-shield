@@ -11,6 +11,7 @@ from backend.app.core.logger import logger
 from backend.app.api.v1.endpoints import predict, health
 from backend.app.services.model_manager import model_manager
 from backend.app.api.v1.endpoints import predict, health, compare 
+from backend.app.api.v1.endpoints import monitoring
 
 # Create FastAPI app
 app = FastAPI(
@@ -32,6 +33,8 @@ app.add_middleware(
 
 # Mount static files if they exist
 frontend_static_path = os.path.join(os.path.dirname(__file__), "../../frontend/static")
+logger.info(f"Static path: {frontend_static_path}")
+logger.info(f"Static path exists: {os.path.exists(frontend_static_path)}")
 if os.path.exists(frontend_static_path):
     app.mount("/static", StaticFiles(directory=frontend_static_path), name="static")
 
@@ -43,6 +46,7 @@ templates = Jinja2Templates(directory=templates_path) if os.path.exists(template
 app.include_router(predict.router, prefix=settings.API_V1_PREFIX)
 app.include_router(health.router, prefix=settings.API_V1_PREFIX)
 app.include_router(compare.router, prefix=settings.API_V1_PREFIX)
+app.include_router(monitoring.router, prefix=settings.API_V1_PREFIX)
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend(request: Request):

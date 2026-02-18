@@ -1,12 +1,13 @@
 import time
 from collections import deque
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 import threading
+
 
 class MonitoringService:
     def __init__(self, maxlen=1000):
         self.lock = threading.Lock()
-        self.recent = deque(maxlen=maxlen)  # each item: {'timestamp', 'model', 'category', 'confidence', 'correct'}
+        self.recent = deque(maxlen=maxlen)
 
     def record_prediction(self, model: str, category: str, confidence: float, correct: Optional[bool] = None):
         with self.lock:
@@ -39,7 +40,6 @@ class MonitoringService:
             avg_conf = {m: sum(v)/len(v) for m, v in confidences.items()}
             accuracy = correct_count / total if correct_count > 0 else None
 
-            # Throughput last 10 minutes (6-second intervals for demo)
             now = time.time()
             throughput = []
             for i in range(10):
@@ -56,5 +56,6 @@ class MonitoringService:
                 'accuracy': accuracy,
                 'throughput': throughput[::-1]
             }
+
 
 monitoring_service = MonitoringService()
