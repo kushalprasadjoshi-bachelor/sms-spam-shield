@@ -115,11 +115,12 @@ cp .env.example .env
 
 ## 🚀 Quick Start
 
-1. **Place your dataset** at `dataset/processed_dataset.csv` (columns: `message_text`, `category`).
-2. **Train all models**:
+1. **Place your dataset** at `dataset/processed_dataset.csv` (columns: `message_text`, `category`) if you have your own dataset.
+2. **Train all models**:    If you want to use the pretrained models no need to run the command below to train new models. Pretrained models will work fine.
    ```bash
    python scripts/train_model.py all
    ```
+
 3. **Start the server**:
    ```bash
    cd backend
