@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SMS Spam Shield{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4"><i class="fas fa-chart-line me-2"></i>Monitoring Dashboard</h1>
+
+    <div class="row" id="dashboard-cards">
+        <!-- Cards will be populated by JS -->
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Prediction Throughput (last 60 seconds)</div>
+                <div class="card-body">
+                    <canvas id="throughputChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Model Distribution</div>
+                <div class="card-body">
+                    <canvas id="modelPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Category Distribution</div>
+                <div class="card-body">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Average Confidence by Model</div>
+                <div class="card-body">
+                    <canvas id="confidenceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', path='js/monitoring.js') }}"></script>
+{% endblock %}

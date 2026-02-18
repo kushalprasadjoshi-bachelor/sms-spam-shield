@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}SMS Spam Shield - Multi-Category XAI Spam Detector{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header animate-fade-in">
+        <h1 class="display-6 fw-bold">
+            <i class="fas fa-shield-alt text-primary me-2"></i>
+            SMS Spam Shield
+        </h1>
+        <p class="lead text-muted">
+            Multi-Category XAI Spam Detector - Classify SMS with explainable AI
+        </p>
+    </div>
+    
+    <!-- Model Selection Cards -->
+    <div class="model-cards mb-4">
+        <!-- Logistic Regression -->
+        <div class="model-card card-entrance" onclick="toggleModel('lr')" id="modelCard-lr">
+            <div class="model-card-header">
+                <div class="model-icon lr">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">Logistic Regression</h6>
+                    <small class="text-muted">Baseline Model</small>
+                </div>
+                <div class="ms-auto">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="model-lr" checked>
+                    </div>
+                </div>
+            </div>
+            <div class="model-metrics" id="metrics-lr">
+                <div class="metric">
+                    <div class="metric-value">92.1%</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">92.1%</div>
+                    <div class="metric-label">F1 Score</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Naive Bayes -->
+        <div class="model-card card-entrance" onclick="toggleModel('nb')" id="modelCard-nb">
+            <div class="model-card-header">
+                <div class="model-icon nb">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">Naive Bayes</h6>
+                    <small class="text-muted">Probabilistic</small>
+                </div>
+                <div class="ms-auto">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="model-nb">
+                    </div>
+                </div>
+            </div>
+            <div class="model-metrics" id="metrics-nb">
+                <div class="metric">
+                    <div class="metric-value">89.3%</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">89.2%</div>
+                    <div class="metric-label">F1 Score</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SVM -->
+        <div class="model-card card-entrance" onclick="toggleModel('svm')" id="modelCard-svm">
+            <div class="model-card-header">
+                <div class="model-icon svm">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">Support Vector Machine</h6>
+                    <small class="text-muted">Tuned with Cross-Validation</small>
+                </div>
+                <div class="ms-auto">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="model-svm">
+                    </div>
+                </div>
+            </div>
+            <div class="model-metrics" id="metrics-svm">
+                <div class="metric">
+                    <div class="metric-value">94.2%</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">94.1%</div>
+                    <div class="metric-label">F1 Score</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LSTM -->
+        <div class="model-card card-entrance" onclick="toggleModel('lstm')" id="modelCard-lstm">
+            <div class="model-card-header">
+                <div class="model-icon lstm">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">LSTM</h6>
+                    <small class="text-muted">Deep Learning</small>
+                </div>
+                <div class="ms-auto">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="model-lstm">
+                    </div>
+                </div>
+            </div>
+            <div class="model-metrics" id="metrics-lstm">
+                <div class="metric">
+                    <div class="metric-value">96.3%</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">96.2%</div>
+                    <div class="metric-label">F1 Score</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chat Input -->
+    <div class="chat-input-container animate-slide-in">
+        <label class="form-label fw-bold">
+            <i class="fas fa-sms me-2"></i>
+            Place your SMS to test
+        </label>
+        <textarea 
+            class="chat-textarea" 
+            id="smsInput" 
+            placeholder="Enter SMS text here... Example: Congratulations! You've won a free iPhone. Click here to claim your prize." 
+            rows="4"></textarea>
+        
+        <div class="mt-3 d-flex justify-content-between align-items-center">
+            <div class="model-selector">
+                <label class="model-checkbox" for="model-lr-check">
+                    <input type="checkbox" id="model-lr-check" checked>
+                    <span class="checkmark"></span>
+                    <span>Logistic Regression</span>
+                </label>
+                <label class="model-checkbox" for="model-nb-check">
+                    <input type="checkbox" id="model-nb-check">
+                    <span class="checkmark"></span>
+                    <span>Naive Bayes</span>
+                </label>
+                <label class="model-checkbox" for="model-svm-check">
+                    <input type="checkbox" id="model-svm-check">
+                    <span class="checkmark"></span>
+                    <span>SVM</span>
+                </label>
+                <label class="model-checkbox" for="model-lstm-check">
+                    <input type="checkbox" id="model-lstm-check">
+                    <span class="checkmark"></span>
+                    <span>LSTM</span>
+                </label>
+            </div>
+            
+            <div>
+                <button class="btn btn-outline-secondary me-2" onclick="clearChat()">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button class="btn btn-outline-info me-2" onclick="showComparisonModal(document.getElementById('smsInput').value)">
+                    <i class="fas fa-balance-scale-left"></i> Compare
+                </button>
+                <button class="predict-btn" id="predictBtn" onclick="predictSMS()">
+                    <i class="fas fa-robot"></i> Analyze SMS
+                </button>
+            </div>
+        </div>
+        
+        <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="includeExplanation" checked>
+            <label class="form-check-label" for="includeExplanation">
+                <i class="fas fa-info-circle text-info me-1"></i>
+                Include AI explanations
+            </label>
+        </div>
+    </div>
+    
+    <!-- Chat Messages -->
+    <div class="chat-messages" id="chatMessages">
+        <!-- Welcome Message -->
+        <div class="message assistant animate-fade-in">
+            <div class="message-content">
+                <div class="message-header">
+                    <div class="message-sender">
+                        <i class="fas fa-robot text-primary"></i>
+                        SMS Spam Shield Assistant
+                    </div>
+                    <div class="message-time">Just now</div>
+                </div>
+                <div class="message-text">
+                    <p>Welcome to SMS Spam Shield! I can help you classify SMS messages into multiple categories:</p>
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        <span class="badge bg-danger">Spam</span>
+                        <span class="badge bg-warning text-dark">Phishing</span>
+                        <span class="badge bg-info">Promotional</span>
+                        <span class="badge bg-success">Legitimate</span>
+                    </div>
+                    <p class="mt-3 mb-0">Enter an SMS above and select models to get started!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Indicator -->
+    <div class="text-center mt-4 d-none" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        <p class="text-muted mt-2">Analyzing SMS with AI models...</p>
+    </div>
+</div>
+
+<!-- SHAP Explanation Modal -->
+<div class="modal fade" id="shapModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-chart-line text-primary me-2"></i>
+                    SHAP Explanation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="shapWaterfallContainer"></div>
+                <div class="mt-4">
+                    <h6>What is SHAP?</h6>
+                    <p class="small text-muted">
+                        SHAP (SHapley Additive exPlanations) uses game theory to explain individual predictions.
+                        Each word's contribution shows how much it pushes the prediction away from the base value.
+                        Positive values (red) push toward spam categories, negative values (green) push toward legitimate.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualization Modal -->
+<div class="modal fade" id="visualizationModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Detailed Analysis
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Confidence Distribution</h6>
+                        <canvas id="confidenceChart" height="250"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Model Comparison</h6>
+                        <canvas id="comparisonChart" height="250"></canvas>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6>Token Importance</h6>
+                        <div id="tokenImportance" class="p-3 bg-light rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sample SMS Modal -->
+<div class="modal fade" id="samplesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-vial me-2"></i>
+                    Sample SMS Messages
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <button class="list-group-item list-group-item-action" onclick="useSample('Congratulations! You won a $1000 Walmart gift card. Claim now: bit.ly/freegift')">
+                        <div class="d-flex justify-content-between">
+                            <span>Phishing Example</span>
+                            <span class="badge bg-warning text-dark">Phishing</span>
+                        </div>
+                        <small class="text-muted">Click to use this sample</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="useSample('URGENT: Your bank account has been compromised. Call now to verify: 1-800-SCAM')">
+                        <div class="d-flex justify-content-between">
+                            <span>Scam Example</span>
+                            <span class="badge bg-danger">Scam</span>
+                        </div>
+                        <small class="text-muted">Click to use this sample</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="useSample('50% OFF all electronics this weekend only! Visit our store or shop online.')">
+                        <div class="d-flex justify-content-between">
+                            <span>Promotional Example</span>
+                            <span class="badge bg-info">Promotional</span>
+                        </div>
+                        <small class="text-muted">Click to use this sample</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="useSample('Hey, are we still meeting for lunch today at 1 PM?')">
+                        <div class="d-flex justify-content-between">
+                            <span>Legitimate Example</span>
+                            <span class="badge bg-success">Legitimate</span>
+                        </div>
+                        <small class="text-muted">Click to use this sample</small>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "components/comparison_modal.html" %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof updateHistoryDisplay === 'function') {
+            updateHistoryDisplay();
+        } else {
+            console.warn('updateHistoryDisplay not defined');
+        }
+        if (typeof loadModelInfo === 'function') {
+            loadModelInfo();
+        }
+        if (typeof updateModelSelectionUI === 'function') {
+            updateModelSelectionUI();
+        }
+        if (typeof setupEventListeners === 'function') {
+            setupEventListeners();
+        }
+    });
+</script>
+{% endblock %}

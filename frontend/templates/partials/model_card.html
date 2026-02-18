@@ -1,0 +1,32 @@
+<div class="model-card card-entrance" onclick="toggleModel('{{ model.id }}')" id="modelCard-{{ model.id }}">
+    <div class="model-card-header">
+        <div class="model-icon {{ model.id }}">
+            <i class="{{ model.icon }}"></i>
+        </div>
+        <div>
+            <h6 class="mb-0">{{ model.name }}</h6>
+            <small class="text-muted">{{ model.subtitle }}</small>
+        </div>
+        <div class="ms-auto">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="model-{{ model.id }}" {% if model.default %}checked{% endif %}>
+            </div>
+        </div>
+    </div>
+    <div class="model-metrics" id="metrics-{{ model.id }}">
+        <div class="metric">
+            <div class="metric-value">{{ "%.1f"|format(model.metrics.accuracy * 100) if model.metrics.accuracy else '--' }}%</div>
+            <div class="metric-label">Accuracy</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">{{ "%.1f"|format(model.metrics.f1_score * 100) if model.metrics.f1_score else '--' }}%</div>
+            <div class="metric-label">F1 Score</div>
+        </div>
+    </div>
+    <div class="mt-2">
+        <small class="text-muted">
+            <i class="fas fa-calendar me-1"></i>
+            Trained: {{ model.trained_date if model.trained_date else 'N/A' }}
+        </small>
+    </div>
+</div>

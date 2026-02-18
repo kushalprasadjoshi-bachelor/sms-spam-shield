@@ -1,0 +1,79 @@
+<!-- Comparison Modal -->
+<div class="modal fade" id="comparisonModal" tabindex="-1" aria-labelledby="comparisonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="comparisonModalLabel">
+                    <i class="fas fa-balance-scale-left me-2"></i>
+                    Model Comparison
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="comparisonContainer">
+                    <!-- Comparison results will be loaded here -->
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <h6>Comparison Chart</h6>
+                        <canvas id="comparisonChart" height="200"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Ensemble Methods</h6>
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h6 class="mb-1">Weighted Voting</h6>
+                                <small class="text-muted">Each model's vote is weighted by confidence</small>
+                            </div>
+                            <div class="list-group-item">
+                                <h6 class="mb-1">Probability Averaging</h6>
+                                <small class="text-muted">Average of all model probabilities</small>
+                            </div>
+                            <div class="list-group-item">
+                                <h6 class="mb-1">Majority Voting</h6>
+                                <small class="text-muted">Simple majority of predictions</small>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button class="btn btn-outline-primary w-100" onclick="loadEnsembleMethods()">
+                                <i class="fas fa-cogs me-2"></i>
+                                View Method Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h6>Interpretation Guide</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-check text-success me-2"></i>Model Agreement</h6>
+                                    <p class="small mb-0">When all models agree, prediction is highly reliable.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-times text-danger me-2"></i>Model Disagreement</h6>
+                                    <p class="small mb-0">When models disagree, consider individual confidence scores.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="exportComparisonData()">
+                    <i class="fas fa-download me-2"></i>
+                    Export Results
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

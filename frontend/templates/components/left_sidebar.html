@@ -1,0 +1,75 @@
+<div class="sidebar-section">
+    <h5>
+        <i class="fas fa-history me-2"></i>
+        Prediction History
+    </h5>
+    <div class="history-list" id="historyList">
+        <div class="text-center text-muted py-3" id="emptyHistory">
+            <i class="fas fa-inbox fa-2x mb-2"></i>
+            <p>No predictions yet</p>
+        </div>
+        <!-- History items will be dynamically added here -->
+    </div>
+</div>
+
+<div class="sidebar-section">
+    <h5>
+        <i class="fas fa-chart-line me-2"></i>
+        Statistics
+    </h5>
+    <div class="stats-container">
+        <div class="stat-item mb-3">
+            <div class="d-flex justify-content-between">
+                <span>Total Predictions</span>
+                <span class="badge bg-primary" id="totalPredictions">0</span>
+            </div>
+            <div class="progress mt-1" style="height: 6px;">
+                <div class="progress-bar" role="progressbar" id="predictionProgress"></div>
+            </div>
+        </div>
+
+        <div class="stat-item mb-3">
+            <div class="d-flex justify-content-between">
+                <span>Spam Detected</span>
+                <span class="badge bg-danger" id="spamCount">0</span>
+            </div>
+            <div class="progress mt-1" style="height: 6px;">
+                <div class="progress-bar bg-danger" role="progressbar" id="spamProgress"></div>
+            </div>
+        </div>
+
+        <div class="stat-item mb-3">
+            <div class="d-flex justify-content-between">
+                <span>Avg Confidence</span>
+                <span class="badge bg-success" id="avgConfidence">0%</span>
+            </div>
+            <div class="progress mt-1" style="height: 6px;">
+                <div class="progress-bar bg-success" role="progressbar" id="confidenceProgress"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sidebar-section">
+    <h5>
+        <i class="fas fa-filter me-2"></i>
+        Quick Filters
+    </h5>
+    <div class="filter-buttons">
+        <button class="btn btn-sm btn-outline-primary mb-2 w-100" onclick="filterHistory('all')">
+            <i class="fas fa-layer-group"></i> All
+        </button>
+        <button class="btn btn-sm btn-outline-danger mb-2 w-100" onclick="filterHistory('spam')">
+            <i class="fas fa-ban"></i> Spam
+        </button>
+        <button class="btn btn-sm btn-outline-warning mb-2 w-100" onclick="filterHistory('phishing')">
+            <i class="fas fa-fish"></i> Phishing
+        </button>
+        <button class="btn btn-sm btn-outline-info mb-2 w-100" onclick="filterHistory('promotional')">
+            <i class="fas fa-bullhorn"></i> Promotional
+        </button>
+        <button class="btn btn-sm btn-outline-success mb-2 w-100" onclick="filterHistory('legitimate')">
+            <i class="fas fa-check-circle"></i> Legitimate
+        </button>
+    </div>
+</div>
