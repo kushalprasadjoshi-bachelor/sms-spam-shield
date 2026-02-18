@@ -234,6 +234,12 @@ function updateStats() {
 
 // Update model selection UI
 function updateModelSelectionUI() {
+    const modelAvailability = {};
+    ['lr', 'nb', 'svm', 'lstm'].forEach(model => {
+        const modelInfo = AppState.modelInfo?.[model];
+        modelAvailability[model] = !modelInfo || modelInfo.status === 'loaded';
+    });
+
     // Update checkboxes
     AppState.selectedModels.forEach(model => {
         const checkbox = document.getElementById(`model-${model}`);
@@ -245,6 +251,8 @@ function updateModelSelectionUI() {
     
     // Update UI for unselected models
     ['lr', 'nb', 'svm', 'lstm'].forEach(model => {
+        const isAvailable = modelAvailability[model];
+
         if (!AppState.selectedModels.has(model)) {
             const checkbox = document.getElementById(`model-${model}`);
             if (checkbox) checkbox.checked = false;
@@ -252,14 +260,37 @@ function updateModelSelectionUI() {
             const card = document.getElementById(`modelCard-${model}`);
             if (card) card.classList.remove('active');
         }
+
+        const checkbox = document.getElementById(`model-${model}`);
+        if (checkbox) checkbox.disabled = !isAvailable;
+
+        const modelCheck = document.getElementById(`model-${model}-check`);
+        if (modelCheck) modelCheck.disabled = !isAvailable;
+
+        const card = document.getElementById(`modelCard-${model}`);
+        if (card) {
+            card.classList.toggle('opacity-50', !isAvailable);
+            card.classList.toggle('disabled-model', !isAvailable);
+        }
     });
 }
 
 // Toggle model selection
 function toggleModel(modelId) {
+    const modelInfo = AppState.modelInfo?.[modelId];
+    if (modelInfo && modelInfo.status !== 'loaded') {
+        showAlert(`${formatModelName(modelId)} is not loaded right now.`, 'warning');
+        return;
+    }
+
     if (AppState.selectedModels.has(modelId)) {
         AppState.selectedModels.delete(modelId);
     } else {
+        AppState.selectedModels.add(modelId);
+    }
+
+    if (AppState.selectedModels.size === 0) {
+        showAlert('Select at least one loaded model.', 'warning');
         AppState.selectedModels.add(modelId);
     }
     
@@ -276,6 +307,12 @@ function toggleModel(modelId) {
 
 // Select a single model (for dropdown)
 function selectModel(modelId) {
+    const modelInfo = AppState.modelInfo?.[modelId];
+    if (modelInfo && modelInfo.status !== 'loaded') {
+        showAlert(`${formatModelName(modelId)} is not loaded right now.`, 'warning');
+        return;
+    }
+
     AppState.selectedModels.clear();
     AppState.selectedModels.add(modelId);
     updateModelSelectionUI();

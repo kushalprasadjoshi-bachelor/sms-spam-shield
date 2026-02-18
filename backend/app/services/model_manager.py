@@ -19,6 +19,23 @@ def _load_lstm_trainer():
     return LSTMTrainer()
 
 
+MODEL_DIR_ALIASES = {
+    "lr": ["lr", "logistic_regression", "logistic"],
+    "nb": ["nb", "naive_bayes", "naivebayes"],
+    "svm": ["svm"],
+    "lstm": ["lstm"],
+}
+
+
+def _resolve_model_dir(model_registry_path: Path, model_key: str) -> Path:
+    candidates = MODEL_DIR_ALIASES.get(model_key, [model_key])
+    for candidate in candidates:
+        candidate_path = model_registry_path / candidate
+        if candidate_path.exists():
+            return candidate_path
+    return model_registry_path / model_key
+
+
 class ModelMetadata:
     def __init__(self, model_type: ModelType):
         self.model_type = model_type
@@ -34,7 +51,12 @@ class ModelMetadata:
 
     def load(self):
         try:
-            model_path = Path(settings.MODEL_REGISTRY_PATH) / self.model_type.value
+            model_registry_path = Path(settings.MODEL_REGISTRY_PATH)
+            model_path = _resolve_model_dir(model_registry_path, self.model_type.value)
+            if model_path.name != self.model_type.value:
+                logger.info(
+                    f"Resolved model path alias for {self.model_type.value}: {model_path.name}"
+                )
 
             if self.model_type.value == "lstm":
                 trainer = _load_lstm_trainer()
@@ -218,7 +240,7 @@ class ModelManager:
 
     def get_model_info(self, model_type: ModelType) -> Optional[Dict[str, Any]]:
         model = self.models.get(model_type)
-        if not model or not model.loaded:
+        if not model:
             return None
 
         return {
@@ -237,7 +259,7 @@ class ModelManager:
         info = {}
         for model_type in ModelType:
             model_info = self.get_model_info(model_type)
-            if model_info:
+            if model_info is not None:
                 info[model_type.value] = model_info
         return info
 

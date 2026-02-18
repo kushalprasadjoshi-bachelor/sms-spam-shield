@@ -262,14 +262,46 @@ class LSTMTrainer(BaseTrainer):
             prod = self.version_manager.get_production_version()
             if not prod:
                 return False
-            version_dir = self.version_manager.versions_dir / prod["version"]
-            self.model = load_model(version_dir / "model.h5")
-            with open(version_dir / "tokenizer.pkl", 'rb') as f:
+
+            version = prod.get("version")
+            if not version:
+                logger.warning("Production LSTM metadata has no version; skipping production load")
+                return False
+
+            version_dir = self.version_manager.versions_dir / version
+            if not version_dir.exists():
+                logger.warning(f"Production LSTM version directory not found: {version_dir}")
+                return False
+
+            model_file = version_dir / "model.h5"
+            if not model_file.exists():
+                fallback_model_file = self.version_manager.model_dir / "model.h5"
+                if fallback_model_file.exists():
+                    model_file = fallback_model_file
+                else:
+                    logger.warning(f"No production LSTM model file found for version {version}")
+                    return False
+
+            tokenizer_file = version_dir / "tokenizer.pkl"
+            if not tokenizer_file.exists():
+                tokenizer_file = self.version_manager.model_dir / "tokenizer.pkl"
+            label_encoder_file = version_dir / "label_encoder.pkl"
+            if not label_encoder_file.exists():
+                label_encoder_file = self.version_manager.model_dir / "label_encoder.pkl"
+
+            if not tokenizer_file.exists() or not label_encoder_file.exists():
+                logger.warning(
+                    f"Missing tokenizer/label encoder for production LSTM version {version}"
+                )
+                return False
+
+            self.model = load_model(model_file)
+            with open(tokenizer_file, 'rb') as f:
                 self.tokenizer = pickle.load(f)
-            with open(version_dir / "label_encoder.pkl", 'rb') as f:
+            with open(label_encoder_file, 'rb') as f:
                 self.label_encoder = pickle.load(f)
-            logger.info(f"Loaded production LSTM version {prod['version']}")
+            logger.info(f"Loaded production LSTM version {version}")
             return True
         except Exception as e:
-            logger.error(f"Failed to load production LSTM: {e}")
+            logger.warning(f"Failed to load production LSTM: {e}")
             return False

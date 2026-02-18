@@ -129,6 +129,22 @@ async function loadModelInfo() {
         
         if (data.models) {
             AppState.modelInfo = data.models;
+            const loadedModels = Object.entries(data.models)
+                .filter(([, model]) => model.status === 'loaded')
+                .map(([modelKey]) => modelKey);
+
+            if (loadedModels.length > 0) {
+                AppState.selectedModels = new Set(
+                    [...AppState.selectedModels].filter(model => loadedModels.includes(model))
+                );
+                if (AppState.selectedModels.size === 0) {
+                    AppState.selectedModels.add(loadedModels[0]);
+                }
+                AppState.save();
+                if (typeof updateModelSelectionUI === 'function') {
+                    updateModelSelectionUI();
+                }
+            }
             updateModelMetrics();
         }
         
