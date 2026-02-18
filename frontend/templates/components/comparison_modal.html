@@ -17,7 +17,7 @@
                 <div class="row mt-4">
                     <div class="col-md-8">
                         <h6>Comparison Chart</h6>
-                        <canvas id="comparisonChart" height="200"></canvas>
+                        <canvas id="comparisonChartModal" height="200"></canvas>
                     </div>
                     <div class="col-md-4">
                         <h6>Ensemble Methods</h6>
@@ -37,6 +37,14 @@
                         </div>
 
                         <div class="mt-3">
+                            <label class="form-label" for="comparisonEnsembleMethod">Method for ensemble summary</label>
+                            <select class="form-select form-select-sm mb-2" id="comparisonEnsembleMethod">
+                                <option value="weighted_voting" selected>Weighted Voting</option>
+                                <option value="averaging">Probability Averaging</option>
+                            </select>
+                            <div class="small text-muted mb-2" id="comparisonEnsembleSummary">
+                                Select a method to calculate ensemble result from comparison.
+                            </div>
                             <button class="btn btn-outline-primary w-100" onclick="loadEnsembleMethods()">
                                 <i class="fas fa-cogs me-2"></i>
                                 View Method Details

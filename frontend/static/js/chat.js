@@ -140,8 +140,8 @@ function createMessageElement(message) {
         
         // Format explanation
         let explanationHtml = '';
-        if (result.explanation && result.explanation.tokens && result.explanation.tokens.length > 0) {
-            const tokensHtml = result.explanation.tokens
+        if (result.explanation && ((result.explanation.tokens || []).length > 0 || result.explanation.text)) {
+            const tokensHtml = (result.explanation.tokens || [])
                 .map(token => `
                     <span class="badge bg-info me-1 mb-1" title="Importance: ${(token.importance * 100).toFixed(1)}%">
                         ${token.word}
@@ -152,9 +152,7 @@ function createMessageElement(message) {
             explanationHtml = `
                 <div class="explanation mt-3">
                     <h6>AI Explanation:</h6>
-                    <div class="explanation-tokens mb-2">
-                        ${tokensHtml}
-                    </div>
+                    ${tokensHtml ? `<div class="explanation-tokens mb-2">${tokensHtml}</div>` : ''}
                     <p class="mt-2 small">${result.explanation.text || 'These words contributed most to the prediction.'}</p>
                 </div>
             `;
@@ -239,17 +237,25 @@ async function predictSMS() {
         const messageId = addUserMessage(smsText);
         
         // Get include explanation setting
-        const includeExplanation = document.getElementById('includeExplanation')?.checked || true;
+        const includeExplanation = document.getElementById('includeExplanation')?.checked ?? true;
+        const ensembleMethod = document.getElementById('ensembleMethodSelect')?.value || 'weighted_voting';
         
         // Call API
         const result = await APIService.predictSMS(
             smsText, 
             AppState.selectedModels, 
-            includeExplanation
+            includeExplanation,
+            ensembleMethod
         );
         
         // Format result for display
         const formattedResult = formatPredictionResult(result);
+        if (includeExplanation && !formattedResult.explanation) {
+            formattedResult.explanation = {
+                tokens: [],
+                text: 'No token-level explanation was produced by the selected model(s) for this message.'
+            };
+        }
         
         // Add assistant message
         addAssistantMessage(messageId, formattedResult);
@@ -322,14 +328,15 @@ function formatPredictionResult(apiResult) {
     
     // Add explanation if available
     if (apiResult.individual_predictions && apiResult.individual_predictions.length > 0) {
-        const firstPred = apiResult.individual_predictions[0];
-        if (firstPred.explanation) {
+        const explainerPrediction = apiResult.individual_predictions.find(pred => pred.explanation);
+        if (explainerPrediction && explainerPrediction.explanation) {
             result.explanation = {
-                tokens: (firstPred.explanation.important_tokens || []).map((token, index) => ({
+                method: explainerPrediction.explanation.method || 'unknown',
+                tokens: (explainerPrediction.explanation.important_tokens || []).map((token, index) => ({
                     word: token,
-                    importance: 0.8 - (index * 0.1) // Simulated importance
+                    importance: Math.max(0.1, 0.9 - (index * 0.08))
                 })),
-                text: 'Important words influencing the prediction:'
+                text: `Important words influencing the prediction (${explainerPrediction.model.toUpperCase()}):`
             };
         }
     }

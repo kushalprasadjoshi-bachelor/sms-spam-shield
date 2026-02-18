@@ -312,6 +312,7 @@ class ModelManager:
         confidences = []
         probabilities_list = []
         model_names = []
+        model_explanations = []
 
         self._class_order = None
 
@@ -342,6 +343,7 @@ class ModelManager:
 
                 probabilities_list.append(probs_list)
                 model_names.append(model_type.value)
+                model_explanations.append(pred_result.get("explanation"))
             except Exception as e:
                 logger.error(f"Error predicting with {model_type.value}: {e}")
                 continue
@@ -357,11 +359,12 @@ class ModelManager:
             ensemble_result = self._weighted_voting(predictions, confidences, probabilities_list)
 
         individual = []
-        for name, pred, conf in zip(model_names, predictions, confidences):
+        for name, pred, conf, exp in zip(model_names, predictions, confidences, model_explanations):
             individual.append({
                 "model": name,
                 "prediction": pred,
-                "confidence": conf
+                "confidence": conf,
+                "explanation": exp
             })
 
         return {

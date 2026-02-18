@@ -186,6 +186,16 @@
                 Include AI explanations
             </label>
         </div>
+        <div class="mt-2">
+            <label class="form-label mb-1" for="ensembleMethodSelect">
+                <i class="fas fa-cogs me-1 text-primary"></i>
+                Ensemble method (used when 2+ models are selected)
+            </label>
+            <select class="form-select form-select-sm" id="ensembleMethodSelect">
+                <option value="weighted_voting" selected>Weighted Voting</option>
+                <option value="averaging">Probability Averaging</option>
+            </select>
+        </div>
     </div>
     
     <!-- Chat Messages -->
@@ -266,7 +276,7 @@
                     </div>
                     <div class="col-md-6">
                         <h6>Model Comparison</h6>
-                        <canvas id="comparisonChart" height="250"></canvas>
+                        <canvas id="visualComparisonChart" height="250"></canvas>
                     </div>
                 </div>
                 <div class="row mt-4">
@@ -337,19 +347,8 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        if (typeof updateHistoryDisplay === 'function') {
-            updateHistoryDisplay();
-        } else {
-            console.warn('updateHistoryDisplay not defined');
-        }
         if (typeof loadModelInfo === 'function') {
             loadModelInfo();
-        }
-        if (typeof updateModelSelectionUI === 'function') {
-            updateModelSelectionUI();
-        }
-        if (typeof setupEventListeners === 'function') {
-            setupEventListeners();
         }
     });
 </script>

@@ -13,6 +13,29 @@ body {
     line-height: 1.6;
 }
 
+.navbar {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand,
+.navbar .dropdown-item {
+    color: var(--text-primary);
+}
+
+.navbar .nav-link:hover,
+.navbar .dropdown-item:hover {
+    color: var(--primary-600);
+}
+
+html[data-bs-theme="dark"] .navbar-light .navbar-brand,
+html[data-bs-theme="dark"] .navbar-light .navbar-nav .nav-link,
+html[data-bs-theme="dark"] .navbar-light .dropdown-item,
+html[data-bs-theme="dark"] .navbar-light .form-check-label {
+    color: var(--text-primary) !important;
+}
+
 /* Layout */
 .sidebar-left, .sidebar-right {
     background-color: var(--bg-sidebar);
@@ -67,7 +90,7 @@ body {
 }
 
 .chat-input-container {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: var(--border-radius);
     padding: 1.5rem;
     box-shadow: var(--shadow-lg);
@@ -136,7 +159,7 @@ body {
 }
 
 .model-checkbox input:checked ~ .checkmark::after {
-    content: '✓';
+    content: '\2713';
     color: white;
     font-size: 14px;
 }
@@ -205,7 +228,7 @@ body {
 }
 
 .message.assistant .message-content {
-    background: white;
+    background: var(--bg-secondary);
     border: 1px solid var(--neutral-200);
     border-bottom-left-radius: 4px;
     box-shadow: var(--shadow-sm);
@@ -287,7 +310,7 @@ body {
 }
 
 .model-card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: var(--border-radius);
     padding: 1.5rem;
     border: 1px solid var(--border-color);
@@ -420,9 +443,39 @@ body {
     background: var(--neutral-100);
     padding: 1rem;
     border-radius: 8px;
-    font-family: 'Courier New', monospace;
+    font-family: 'Consolas', 'Courier New', monospace;
     margin: 0.5rem 0;
     overflow-x: auto;
+    border: 1px solid var(--border-color);
+}
+
+.disabled-model {
+    pointer-events: none;
+}
+
+html[data-bs-theme="dark"] .card,
+html[data-bs-theme="dark"] .chat-input-container,
+html[data-bs-theme="dark"] .message.assistant .message-content,
+html[data-bs-theme="dark"] .model-card,
+html[data-bs-theme="dark"] .modal-content {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+html[data-bs-theme="dark"] .bg-light,
+html[data-bs-theme="dark"] .tip-item {
+    background-color: var(--neutral-800) !important;
+    color: var(--text-primary);
+}
+
+html[data-bs-theme="dark"] .text-muted,
+html[data-bs-theme="dark"] .text-white-50 {
+    color: var(--text-muted) !important;
+}
+
+html[data-bs-theme="dark"] .footer {
+    background: var(--neutral-900);
 }
 
 /* Footer */

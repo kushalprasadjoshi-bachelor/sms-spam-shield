@@ -74,3 +74,20 @@
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
 }
+
+html[data-bs-theme="dark"] {
+    --bg-primary: #0b1220;
+    --bg-secondary: #121a2b;
+    --bg-sidebar: #0f1726;
+    --text-primary: #e5e7eb;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: #273449;
+    --neutral-100: #1a2335;
+    --neutral-200: #273449;
+    --neutral-300: #33465f;
+    --neutral-800: #10192a;
+    --neutral-900: #0a1220;
+    --primary-50: #1a2842;
+    --primary-100: #1f3352;
+}

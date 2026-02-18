@@ -119,11 +119,19 @@ async def ensemble_predict(
 
         individual = []
         for ind in result["individual_predictions"]:
+            explanation_obj = None
+            exp = ind.get("explanation")
+            if request.include_explanation and isinstance(exp, dict):
+                explanation_obj = Explanation(
+                    important_tokens=[t["word"] for t in exp.get("important_tokens", [])],
+                    confidence=ind["confidence"],
+                    method=exp.get("method", "unknown")
+                )
             model_pred = ModelPrediction(
                 model=ModelType(ind["model"]),
                 prediction=ind["prediction"],
                 confidence=ind["confidence"],
-                explanation=None
+                explanation=explanation_obj
             )
             individual.append(model_pred)
 

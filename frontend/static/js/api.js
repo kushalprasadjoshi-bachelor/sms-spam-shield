@@ -28,15 +28,20 @@ const APIService = {
     },
     
     // Predict SMS
-    async predictSMS(sms, models, includeExplanation = true) {
+    async predictSMS(sms, models, includeExplanation = true, ensembleMethod = 'weighted_voting') {
         try {
+            const modelList = Array.from(models || []);
             const payload = {
                 sms: sms,
-                models: Array.from(models),
+                models: modelList,
                 include_explanation: includeExplanation
             };
-            
-            const response = await fetch(`${API_BASE_URL}/predict`, {
+
+            const endpoint = modelList.length > 1
+                ? `${API_BASE_URL}/ensemble?method=${encodeURIComponent(ensembleMethod)}`
+                : `${API_BASE_URL}/predict`;
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -146,6 +151,9 @@ async function loadModelInfo() {
                 }
             }
             updateModelMetrics();
+            if (typeof updateModelTheoryFromSelection === 'function') {
+                updateModelTheoryFromSelection();
+            }
         }
         
         return data;
@@ -163,18 +171,17 @@ function updateModelMetrics() {
         const model = models[modelKey];
         const metricsDiv = document.getElementById(`metrics-${modelKey}`);
         
-        if (metricsDiv && model.status === 'loaded') {
-            // Update accuracy
-            const accuracyEl = metricsDiv.querySelector('.metric-value');
-            if (accuracyEl) {
-                accuracyEl.textContent = (model.accuracy * 100).toFixed(1) + '%';
-            }
-            
-            // Update F1 score (we'll use accuracy for both for now)
-            const f1El = metricsDiv.querySelectorAll('.metric-value')[1];
-            if (f1El) {
-                f1El.textContent = (model.f1_score * 100).toFixed(1) + '%';
-            }
+        if (!metricsDiv) return;
+
+        const accuracyEl = metricsDiv.querySelector('.metric-value');
+        const f1El = metricsDiv.querySelectorAll('.metric-value')[1];
+        const isLoaded = model.status === 'loaded';
+
+        if (accuracyEl) {
+            accuracyEl.textContent = isLoaded ? `${(model.accuracy * 100).toFixed(1)}%` : 'N/A';
+        }
+        if (f1El) {
+            f1El.textContent = isLoaded ? `${(model.f1_score * 100).toFixed(1)}%` : 'N/A';
         }
     });
 }
@@ -209,7 +216,7 @@ function useSample(sampleText) {
 
 // Show visualization modal
 function showVisualization(messageId) {
-    const message = AppState.chatHistory.find(m => m.id === messageId);
+    const message = AppState.chatHistory.find(m => m.id === messageId && m.type === 'assistant');
     if (!message || message.type !== 'assistant') return;
     
     // Create visualization data
@@ -291,7 +298,7 @@ function updateConfidenceChart(data) {
 
 // Update comparison chart
 function updateComparisonChart(data) {
-    const ctx = document.getElementById('comparisonChart');
+    const ctx = document.getElementById('visualComparisonChart');
     if (!ctx) return;
     
     // Destroy existing chart if it exists
