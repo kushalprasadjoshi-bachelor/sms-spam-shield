@@ -516,9 +516,15 @@ class ModelManager:
             "probabilities": avg_probs.tolist()
         }
 
-    def compare_models(self, text: str) -> Dict[str, Any]:
+    def compare_models(self, text: str, model_types: Optional[List[ModelType]] = None) -> Dict[str, Any]:
         results = {}
-        for model_type, model in self.models.items():
+
+        target_types = model_types if model_types else list(self.models.keys())
+        for model_type in target_types:
+            model = self.models.get(model_type)
+            if model is None:
+                continue
+
             if not model.loaded:
                 continue
             try:

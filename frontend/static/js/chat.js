@@ -28,11 +28,19 @@ function addUserMessage(text) {
 
 // Add assistant message to chat
 function addAssistantMessage(messageId, result) {
+    const hasPreviousAssistantPrediction = AppState.chatHistory.some(
+        msg => msg.type === 'assistant' && msg.result
+    );
+    const normalizedResult = {
+        ...result,
+        prediction_id: result?.prediction_id || messageId
+    };
+
     const message = {
         id: messageId,
         type: 'assistant',
-        time: formatTime(),
-        result: result
+        time: hasPreviousAssistantPrediction ? formatTime() : 'Just now',
+        result: normalizedResult
     };
     
     AppState.addMessage(message);
@@ -142,25 +150,39 @@ function createMessageElement(message) {
             `;
         }
         
+        const predictionId = result.prediction_id || message.id;
+
         // Format explanation
         let explanationHtml = '';
-        if (result.explanation && (result.explanation.tokens || []).length > 0) {
-            const tokensHtml = (result.explanation.tokens || [])
-                .map(token => `
-                    <span class="badge bg-info me-1 mb-1" title="Importance: ${(token.importance * 100).toFixed(1)}%">
-                        ${token.word}
-                    </span>
-                `)
-                .join('');
-            
+        const explanationBlocks = (result.explanations || [])
+            .filter(expl => Array.isArray(expl.tokens) && expl.tokens.length > 0)
+            .map(expl => {
+                const tokensHtml = expl.tokens
+                    .map(token => `
+                        <span class="badge bg-info me-1 mb-1" title="Importance: ${(token.importance * 100).toFixed(1)}%">
+                            ${token.word}
+                        </span>
+                    `)
+                    .join('');
+
+                return `
+                    <div class="mb-2">
+                        <p class="mt-2 small mb-2">${expl.text || 'Important words influencing the prediction:'}</p>
+                        <div class="explanation-tokens mb-2">${tokensHtml}</div>
+                    </div>
+                `;
+            });
+
+        if (explanationBlocks.length > 0) {
             explanationHtml = `
                 <div class="explanation mt-3">
                     <h6>AI Explanation:</h6>
-                    <div class="explanation-tokens mb-2">${tokensHtml}</div>
-                    <p class="mt-2 small">${result.explanation.text || 'These words contributed most to the prediction.'}</p>
+                    ${explanationBlocks.join('')}
                 </div>
             `;
         }
+
+        const feedbackHtml = createFeedbackControls(result, predictionId);
         
         div.innerHTML = `
             <div class="message-content">
@@ -197,6 +219,7 @@ function createMessageElement(message) {
                         
                         ${modelsHtml}
                         ${explanationHtml}
+                        ${feedbackHtml}
                         
                         <div class="mt-3 text-end">
                             <small class="text-muted">
@@ -311,15 +334,18 @@ async function predictSMS() {
 // Format API prediction result for display
 function formatPredictionResult(apiResult) {
     const result = {
+        prediction_id: apiResult.prediction_id || null,
         category: apiResult.ensemble_prediction || 'Unknown',
         confidence: apiResult.ensemble_confidence || 0,
         models: [],
+        model_codes: [],
         model_count: apiResult.individual_predictions?.length || 0,
         processing_time: apiResult.processing_time_ms || 0
     };
     
     // Format individual model predictions
     if (apiResult.individual_predictions) {
+        result.model_codes = apiResult.individual_predictions.map(pred => pred.model);
         result.models = apiResult.individual_predictions.map(pred => ({
             name: formatModelName(pred.model),
             prediction: pred.prediction || 'Unknown',
@@ -328,17 +354,20 @@ function formatPredictionResult(apiResult) {
         }));
     }
     
-    // Add explanation if available
+    // Add explanation if available (per model)
     if (apiResult.individual_predictions && apiResult.individual_predictions.length > 0) {
-        const explainerPrediction = apiResult.individual_predictions.find(pred => pred.explanation);
-        if (explainerPrediction && explainerPrediction.explanation) {
-            const normalizedExplanation = normalizeExplanationData(explainerPrediction.explanation);
+        const explanations = [];
+
+        apiResult.individual_predictions.forEach(pred => {
+            if (!pred.explanation) return;
+            const normalizedExplanation = normalizeExplanationData(pred.explanation);
             const importantWords = normalizedExplanation.importantWords;
             const importanceMap = normalizedExplanation.importanceMap;
 
             if (importantWords.length > 0) {
-                result.explanation = {
-                    method: explainerPrediction.explanation.method || 'unknown',
+                explanations.push({
+                    model: pred.model,
+                    method: pred.explanation.method || 'unknown',
                     tokens: importantWords.map((token, index) => ({
                         word: token,
                         importance: Math.max(
@@ -346,9 +375,14 @@ function formatPredictionResult(apiResult) {
                             Number(importanceMap[token] || 0) || Math.max(0.1, 0.9 - (index * 0.08))
                         )
                     })),
-                    text: `Important words influencing the prediction (${explainerPrediction.model.toUpperCase()}):`
-                };
+                    text: `Important words influencing the prediction (${pred.model.toUpperCase()}):`
+                });
             }
+        });
+
+        if (explanations.length > 0) {
+            result.explanations = explanations;
+            result.explanation = explanations[0];
         }
     }
     
@@ -367,6 +401,130 @@ function formatPredictionResult(apiResult) {
     }
     
     return result;
+}
+
+function createFeedbackControls(result, predictionId) {
+    const isSubmitted = Boolean(result.feedback_submitted);
+
+    const categoryOptions = ['spam', 'phishing', 'promotional', 'legitimate', 'scam', 'ham']
+        .map(label => `
+            <option value="${label}" ${String(result.category || '').toLowerCase() === label ? 'selected' : ''}>
+                ${label.charAt(0).toUpperCase() + label.slice(1)}
+            </option>
+        `)
+        .join('');
+
+    return `
+        <div class="feedback-section mt-3" id="feedback-section-${predictionId}">
+            <div class="small fw-semibold mb-2">Was this correct?</div>
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-sm btn-outline-success" type="button" onclick="submitPredictionFeedback('${predictionId}', true)" ${isSubmitted ? 'disabled' : ''}>
+                    <i class="fas fa-check me-1"></i> Yes
+                </button>
+                <button class="btn btn-sm btn-outline-danger" type="button" onclick="toggleFeedbackCorrectionForm('${predictionId}')" ${isSubmitted ? 'disabled' : ''}>
+                    <i class="fas fa-times me-1"></i> No
+                </button>
+            </div>
+            <div class="mt-2 d-none" id="feedback-form-${predictionId}">
+                <div class="input-group input-group-sm">
+                    <label class="input-group-text" for="feedback-correction-${predictionId}">Correct Label</label>
+                    <select class="form-select" id="feedback-correction-${predictionId}">
+                        ${categoryOptions}
+                    </select>
+                    <button class="btn btn-primary" type="button" onclick="submitFeedbackCorrection('${predictionId}')">
+                        Submit
+                    </button>
+                </div>
+            </div>
+            <small class="text-muted d-block mt-2" id="feedback-status-${predictionId}">
+                ${isSubmitted ? 'Feedback submitted. Thank you.' : 'Your feedback helps improve model retraining.'}
+            </small>
+        </div>
+    `;
+}
+
+function getPredictionMessages(predictionId) {
+    const userMessage = AppState.chatHistory.find(msg => msg.id === predictionId && msg.type === 'user');
+    const assistantMessage = AppState.chatHistory.find(msg => msg.id === predictionId && msg.type === 'assistant');
+    return { userMessage, assistantMessage };
+}
+
+function toggleFeedbackCorrectionForm(predictionId) {
+    const form = document.getElementById(`feedback-form-${predictionId}`);
+    if (!form) return;
+    form.classList.toggle('d-none');
+}
+
+function setFeedbackSubmittedState(predictionId, submittedText = 'Feedback submitted. Thank you.') {
+    const section = document.getElementById(`feedback-section-${predictionId}`);
+    if (section) {
+        section.querySelectorAll('button').forEach(button => {
+            button.disabled = true;
+        });
+    }
+
+    const statusEl = document.getElementById(`feedback-status-${predictionId}`);
+    if (statusEl) {
+        statusEl.textContent = submittedText;
+    }
+}
+
+async function sendFeedbackPayload(predictionId, correctedLabel) {
+    const { userMessage, assistantMessage } = getPredictionMessages(predictionId);
+    if (!assistantMessage?.result) {
+        showAlert('Could not locate prediction to send feedback.', 'warning');
+        return;
+    }
+
+    const payload = {
+        prediction_id: predictionId,
+        sms: userMessage?.text || '',
+        predicted_label: assistantMessage.result.category || 'unknown',
+        corrected_label: correctedLabel,
+        selected_models: assistantMessage.result.model_codes || []
+    };
+
+    await APIService.submitFeedback(payload);
+
+    assistantMessage.result.feedback_submitted = true;
+    AppState.save();
+    setFeedbackSubmittedState(predictionId);
+}
+
+async function submitPredictionFeedback(predictionId, isCorrect) {
+    try {
+        const { assistantMessage } = getPredictionMessages(predictionId);
+        if (!assistantMessage?.result) return;
+
+        const correctedLabel = isCorrect
+            ? String(assistantMessage.result.category || 'unknown').toLowerCase()
+            : null;
+
+        if (!correctedLabel) {
+            toggleFeedbackCorrectionForm(predictionId);
+            return;
+        }
+
+        await sendFeedbackPayload(predictionId, correctedLabel);
+    } catch (error) {
+        console.error('Feedback submission failed:', error);
+        showAlert(`Feedback submission failed: ${error.message}`, 'danger');
+    }
+}
+
+async function submitFeedbackCorrection(predictionId) {
+    try {
+        const select = document.getElementById(`feedback-correction-${predictionId}`);
+        if (!select || !select.value) {
+            showAlert('Please choose the correct label.', 'warning');
+            return;
+        }
+
+        await sendFeedbackPayload(predictionId, String(select.value).toLowerCase());
+    } catch (error) {
+        console.error('Feedback correction failed:', error);
+        showAlert(`Feedback submission failed: ${error.message}`, 'danger');
+    }
 }
 
 function normalizeExplanationData(explanation) {
@@ -489,3 +647,6 @@ function escapeHtml(text) {
 window.predictSMS = predictSMS;
 window.addUserMessage = addUserMessage;
 window.addAssistantMessage = addAssistantMessage;
+window.submitPredictionFeedback = submitPredictionFeedback;
+window.submitFeedbackCorrection = submitFeedbackCorrection;
+window.toggleFeedbackCorrectionForm = toggleFeedbackCorrectionForm;

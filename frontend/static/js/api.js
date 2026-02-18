@@ -91,14 +91,17 @@ const APIService = {
     },
 
     // Compare models
-    async compareModels(sms) {
+    async compareModels(sms, models = []) {
         try {
             const response = await fetch(`${API_BASE_URL}/compare`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ sms: sms })
+                body: JSON.stringify({
+                    sms: sms,
+                    models: Array.from(models || [])
+                })
             });
             
             if (!response.ok) {
@@ -122,6 +125,29 @@ const APIService = {
         } catch (error) {
             console.error('Failed to fetch ensemble methods:', error);
             return { methods: [], error: error.message };
+        }
+    },
+
+    // Submit user feedback for a prediction
+    async submitFeedback(payload) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/feedback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || `HTTP ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Feedback submission failed:', error);
+            throw error;
         }
     }
 };
@@ -217,7 +243,10 @@ function useSample(sampleText) {
 // Show visualization modal
 function showVisualization(messageId) {
     const message = AppState.chatHistory.find(m => m.id === messageId && m.type === 'assistant');
-    if (!message || message.type !== 'assistant') return;
+    if (!message || message.type !== 'assistant') {
+        showAlert('Could not load details for this prediction.', 'warning');
+        return;
+    }
     
     // Create visualization data
     const visualizationData = prepareVisualizationData(message.result);
@@ -233,9 +262,11 @@ function showVisualization(messageId) {
 // Prepare visualization data
 function prepareVisualizationData(result) {
     const data = {
+        category: result.category || 'Unknown',
         confidence: result.confidence,
         modelResults: result.models || [],
-        tokens: result.explanation?.tokens || []
+        processingTime: result.processing_time || 0,
+        explanations: result.explanations || (result.explanation ? [result.explanation] : [])
     };
     
     return data;
@@ -243,6 +274,8 @@ function prepareVisualizationData(result) {
 
 // Update visualization modal content
 function updateVisualizationModal(data) {
+    updateVisualizationSummary(data);
+
     // Update confidence chart
     updateConfidenceChart(data);
     
@@ -250,7 +283,27 @@ function updateVisualizationModal(data) {
     updateComparisonChart(data);
     
     // Update token importance
-    updateTokenImportance(data.tokens);
+    updateTokenImportance(data.explanations || []);
+}
+
+function updateVisualizationSummary(data) {
+    const summaryEl = document.getElementById('visualizationSummary');
+    if (!summaryEl) return;
+
+    const modelRows = (data.modelResults || [])
+        .map(model => `<li><strong>${model.name}:</strong> ${model.prediction} (${(model.confidence * 100).toFixed(1)}%)</li>`)
+        .join('');
+
+    summaryEl.innerHTML = `
+        <div class="small">
+            <p class="mb-1"><strong>Final Category:</strong> ${data.category}</p>
+            <p class="mb-1"><strong>Processing Time:</strong> ${data.processingTime} ms</p>
+            <p class="mb-1"><strong>Model Outputs:</strong></p>
+            <ul class="mb-0 ps-3">
+                ${modelRows || '<li>No model outputs available.</li>'}
+            </ul>
+        </div>
+    `;
 }
 
 // Update confidence chart
@@ -353,53 +406,58 @@ function updateComparisonChart(data) {
 }
 
 // Update token importance display
-function updateTokenImportance(tokens) {
+function updateTokenImportance(explanations) {
     const container = document.getElementById('tokenImportance');
     if (!container) return;
     
-    if (tokens.length === 0) {
+    const blocks = (explanations || []).filter(expl => Array.isArray(expl.tokens) && expl.tokens.length > 0);
+
+    if (blocks.length === 0) {
         container.innerHTML = '<p class="text-muted text-center">No token importance data available</p>';
         return;
     }
     
-    // Sort tokens by importance
-    const sortedTokens = [...tokens].sort((a, b) => b.importance - a.importance);
-    
-    let html = '<div class="d-flex flex-wrap gap-2">';
-    sortedTokens.forEach(token => {
-        const importancePercent = (token.importance * 100).toFixed(1);
-        const colorIntensity = Math.min(100, Math.max(20, token.importance * 100));
-        
-        html += `
-            <div class="token-badge" style="
-                background-color: rgba(239, 68, 68, ${colorIntensity / 100});
-                padding: 0.5rem 1rem;
-                border-radius: 20px;
-                color: ${colorIntensity > 50 ? 'white' : 'black'};
-                font-weight: bold;
-                position: relative;
-            ">
-                ${token.word}
-                <span class="importance-value" style="
-                    font-size: 0.7rem;
-                    position: absolute;
-                    top: -8px;
-                    right: -8px;
-                    background: white;
-                    border-radius: 50%;
-                    width: 20px;
-                    height: 20px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border: 1px solid #ddd;
+    let html = '';
+    blocks.forEach(block => {
+        const sortedTokens = [...block.tokens].sort((a, b) => b.importance - a.importance);
+        html += `<div class="mb-3"><h6 class="small mb-2">${block.text || 'Token Importance'}</h6><div class="d-flex flex-wrap gap-2">`;
+
+        sortedTokens.forEach(token => {
+            const importancePercent = (token.importance * 100).toFixed(1);
+            const colorIntensity = Math.min(100, Math.max(20, token.importance * 100));
+
+            html += `
+                <div class="token-badge" style="
+                    background-color: rgba(239, 68, 68, ${colorIntensity / 100});
+                    padding: 0.5rem 1rem;
+                    border-radius: 20px;
+                    color: ${colorIntensity > 50 ? 'white' : 'black'};
+                    font-weight: bold;
+                    position: relative;
                 ">
-                    ${importancePercent}%
-                </span>
-            </div>
-        `;
+                    ${token.word}
+                    <span class="importance-value" style="
+                        font-size: 0.7rem;
+                        position: absolute;
+                        top: -8px;
+                        right: -8px;
+                        background: white;
+                        border-radius: 50%;
+                        width: 20px;
+                        height: 20px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border: 1px solid #ddd;
+                    ">
+                        ${importancePercent}%
+                    </span>
+                </div>
+            `;
+        });
+
+        html += '</div></div>';
     });
-    html += '</div>';
     
     container.innerHTML = html;
 }

@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     # Model paths
     MODEL_REGISTRY_PATH: str = "./models"
     DATASET_PATH: str = "./dataset/processed/processed_dataset_balanced.csv"
+    FEEDBACK_STORE_PATH: str = "./data/feedback.json"
     
     # ML settings
     TEST_SIZE: float = 0.2

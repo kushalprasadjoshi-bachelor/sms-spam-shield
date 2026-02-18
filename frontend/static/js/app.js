@@ -103,6 +103,12 @@ function getModelDisplayName(modelId) {
     return names[modelId] || modelId;
 }
 
+function formatMetricPercent(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) return 'N/A';
+    return `${(numeric * 100).toFixed(2)}%`;
+}
+
 function getAssistantForMessage(messageId) {
     return AppState.chatHistory.find(msg => msg.id === messageId && msg.type === 'assistant');
 }
@@ -333,6 +339,81 @@ function updateModelSelectionUI() {
     }
 }
 
+function showModelMetrics(modelId) {
+    const model = AppState.modelInfo?.[modelId];
+    if (!model) {
+        showAlert('Metrics are not available yet for this model.', 'warning');
+        return;
+    }
+
+    const parameters = model.parameters || {};
+    const parameterRows = Object.keys(parameters).length > 0
+        ? Object.entries(parameters).map(([key, value]) => `
+            <tr>
+                <td>${escapeHtml(String(key))}</td>
+                <td><code>${escapeHtml(String(value))}</code></td>
+            </tr>
+        `).join('')
+        : '<tr><td colspan="2" class="text-muted">No model parameters available.</td></tr>';
+
+    const metricsContent = `
+        <div class="table-responsive mb-3">
+            <table class="table table-sm table-striped">
+                <tbody>
+                    <tr><th>Status</th><td>${model.status === 'loaded' ? 'Loaded' : 'Not Loaded'}</td></tr>
+                    <tr><th>Accuracy</th><td>${formatMetricPercent(model.accuracy)}</td></tr>
+                    <tr><th>Precision</th><td>${formatMetricPercent(model.precision)}</td></tr>
+                    <tr><th>Recall</th><td>${formatMetricPercent(model.recall)}</td></tr>
+                    <tr><th>F1 Score</th><td>${formatMetricPercent(model.f1_score)}</td></tr>
+                    <tr><th>Training Date</th><td>${model.training_date || 'N/A'}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <h6>Parameters</h6>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr><th>Parameter</th><th>Value</th></tr>
+                </thead>
+                <tbody>${parameterRows}</tbody>
+            </table>
+        </div>
+    `;
+
+    showMetricsModal(`${getModelDisplayName(modelId)} Metrics`, metricsContent);
+}
+
+function showMetricsModal(title, content) {
+    let modal = document.getElementById('modelMetricsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'modelMetricsModal';
+        modal.tabIndex = -1;
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    modal.querySelector('.modal-title').textContent = title;
+    modal.querySelector('.modal-body').innerHTML = content;
+
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
+
 function toggleModel(modelId) {
     const modelInfo = AppState.modelInfo?.[modelId];
     if (modelInfo && modelInfo.status !== 'loaded') {
@@ -518,3 +599,4 @@ window.updateHistoryDisplay = updateHistoryDisplay;
 window.updateModelSelectionUI = updateModelSelectionUI;
 window.setupEventListeners = setupEventListeners;
 window.toggleFooter = toggleFooter;
+window.showModelMetrics = showModelMetrics;

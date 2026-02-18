@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .core.config import settings
 from .core.logger import logger
-from .api.v1.endpoints import predict, health, compare, monitoring, models
+from .api.v1.endpoints import predict, health, compare, monitoring, models, feedback
 from .services.model_manager import model_manager
 
 # Create FastAPI app
@@ -48,6 +48,7 @@ app.include_router(health.router, prefix=settings.API_V1_PREFIX)
 app.include_router(compare.router, prefix=settings.API_V1_PREFIX)
 app.include_router(monitoring.router, prefix=settings.API_V1_PREFIX)
 app.include_router(models.router, prefix=settings.API_V1_PREFIX)
+app.include_router(feedback.router, prefix=settings.API_V1_PREFIX)
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend(request: Request):
@@ -67,6 +68,17 @@ async def serve_frontend(request: Request):
             </body>
         </html>
     """)
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def serve_dashboard(request: Request):
+    """Serve the monitoring dashboard page."""
+    if templates:
+        return templates.TemplateResponse(
+            "dashboard.html",
+            {"request": request, "project_name": settings.PROJECT_NAME}
+        )
+    return HTMLResponse("<h1>Dashboard template not found</h1>", status_code=404)
 
 
 @app.on_event("startup")

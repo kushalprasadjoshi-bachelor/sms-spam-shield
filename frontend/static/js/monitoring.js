@@ -1,4 +1,4 @@
-let throughputChart, modelPieChart, categoryChart, confidenceChart;
+let throughputChart, modelPieChart, categoryChart, confidenceChart, feedbackModelChart;
 
 async function refreshDashboard() {
     try {
@@ -15,6 +15,10 @@ async function refreshDashboard() {
         const avgConf = data.average_confidence || {};
         const throughputData = data.throughput || [];
         const accuracy = data.accuracy;
+        const feedbackStats = data.feedback_stats || {};
+        const totalCorrections = feedbackStats.total_corrections || 0;
+        const totalFeedback = feedbackStats.total_feedback || 0;
+        const correctionsByModel = feedbackStats.corrections_by_model || {};
 
         // Update cards
         const dashboardCards = document.getElementById('dashboard-cards');
@@ -49,6 +53,15 @@ async function refreshDashboard() {
                         <div class="card-body">
                             <h5 class="card-title">Categories</h5>
                             <p class="card-text display-6">${Object.keys(categoryDist).length}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-danger mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Corrections</h5>
+                            <p class="card-text display-6">${totalCorrections}</p>
+                            <small>${totalFeedback} feedback submitted</small>
                         </div>
                     </div>
                 </div>
@@ -127,6 +140,33 @@ async function refreshDashboard() {
                 },
                 options: {
                     scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+        }
+
+        // Feedback corrections by model
+        const feedbackEl = document.getElementById('feedbackModelChart');
+        if (feedbackEl) {
+            const feedbackCtx = feedbackEl.getContext('2d');
+            if (feedbackModelChart) feedbackModelChart.destroy();
+
+            const labels = Object.keys(correctionsByModel);
+            const values = Object.values(correctionsByModel);
+
+            feedbackModelChart = new Chart(feedbackCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length > 0 ? labels : ['No corrections yet'],
+                    datasets: [{
+                        label: 'Corrections',
+                        data: values.length > 0 ? values : [0],
+                        backgroundColor: '#ef4444'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
                 }
             });
         }

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from ....schemas.prediction import CompareRequest
+from ....schemas.prediction import CompareRequest, ModelType
 from ....services.model_manager import model_manager
 from ....core.logger import logger
 
@@ -18,7 +18,19 @@ async def compare_model_predictions(request: CompareRequest):
         sms = request.sms
         logger.info(f"Model comparison request for SMS: {sms[:100]}...")
 
-        results = model_manager.compare_models(sms)
+        selected_models = request.models if request.models else list(ModelType)
+        if len(selected_models) < 2:
+            raise HTTPException(
+                status_code=400,
+                detail="Please select at least two models for comparison"
+            )
+
+        results = model_manager.compare_models(sms, model_types=selected_models)
+        if results["total_models"] < 2:
+            raise HTTPException(
+                status_code=400,
+                detail="At least two selected models must be loaded to compare"
+            )
 
         formatted_results = []
         for model_name, result in results["comparison"].items():

@@ -22,9 +22,9 @@ class ModelComparison {
         });
     }
 
-    async compareModels(smsText) {
+    async compareModels(smsText, selectedModels) {
         try {
-            const response = await APIService.compareModels(smsText);
+            const response = await APIService.compareModels(smsText, selectedModels);
             this.currentSms = smsText;
             this.comparisonData = response;
             this.updateComparisonUI();
@@ -276,10 +276,16 @@ class ModelComparison {
             return;
         }
 
+        const selectedModels = [...(AppState?.selectedModels || [])];
+        if (selectedModels.length < 2) {
+            showAlert('Select at least two models to compare.', 'warning');
+            return;
+        }
+
         const modalTitle = document.getElementById('comparisonModalLabel');
         if (modalTitle) {
             const safePreview = smsText.substring(0, 50);
-            modalTitle.textContent = `Model Comparison: "${safePreview}${smsText.length > 50 ? '...' : ''}"`;
+            modalTitle.textContent = `Model Comparison (${selectedModels.length} selected): "${safePreview}${smsText.length > 50 ? '...' : ''}"`;
         }
 
         const comparisonContainer = document.getElementById('comparisonContainer');
@@ -294,7 +300,7 @@ class ModelComparison {
 
         const modal = new bootstrap.Modal(document.getElementById('comparisonModal'));
         modal.show();
-        this.compareModels(smsText);
+        this.compareModels(smsText, selectedModels);
     }
 
     exportComparisonData() {

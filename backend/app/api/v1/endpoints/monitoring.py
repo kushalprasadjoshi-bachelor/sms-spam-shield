@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response
 
 from ....services.monitoring_service import monitoring_service
+from ....services.feedback_service import feedback_service
 
 try:
     from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -22,4 +23,6 @@ async def get_metrics():
 @router.get("/dashboard")
 async def get_dashboard():
     """Return real-time monitoring data."""
-    return monitoring_service.get_dashboard_data()
+    dashboard_data = monitoring_service.get_dashboard_data()
+    dashboard_data["feedback_stats"] = feedback_service.get_stats()
+    return dashboard_data

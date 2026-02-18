@@ -40,7 +40,7 @@ function initializeMetricsChart() {
                 }
             },
             plugins: {
-                legend: { display: false },
+                legend: { display: true },
                 tooltip: {
                     callbacks: {
                         label(context) {
@@ -54,24 +54,35 @@ function initializeMetricsChart() {
 }
 
 function updateModelTheoryFromSelection() {
-    const selected = AppState?.activeModel || [...(AppState?.selectedModels || [])][0] || 'lr';
-    loadModelTheory(selected);
+    const selectedModels = [...(AppState?.selectedModels || [])];
+    if (selectedModels.length === 0) {
+        loadModelTheory(['lr']);
+        return;
+    }
+
+    const active = AppState?.activeModel;
+    const orderedModels = active && selectedModels.includes(active)
+        ? [active, ...selectedModels.filter(model => model !== active)]
+        : selectedModels;
+
+    loadModelTheory(orderedModels);
 }
 
-function loadModelTheory(modelId) {
+function loadModelTheory(modelIds) {
+    const models = Array.isArray(modelIds) ? modelIds : [modelIds];
     const theoryContent = document.getElementById('modelTheory');
     const mathContent = document.getElementById('modelMath');
     if (!theoryContent || !mathContent) return;
 
-    theoryContent.innerHTML = getModelTheory(modelId);
-    mathContent.innerHTML = getModelMathematics(modelId);
-    updateMetricsChartForModel(modelId);
+    theoryContent.innerHTML = models.map(getModelTheory).join('<hr class="my-3">');
+    mathContent.innerHTML = models.map(getModelMathematics).join('<hr class="my-3">');
+    updateMetricsChartForModels(models);
 }
 
 function getModelTheory(modelId) {
     const theoryMap = {
         lr: `
-            <h6>Logistic Regression</h6>
+            <h6><i class="fas fa-chart-line text-primary me-2"></i>Logistic Regression</h6>
             <p>Linear classifier that estimates class probabilities through a logistic link function.</p>
             <ul>
                 <li>Fast and interpretable baseline for text vectors.</li>
@@ -80,7 +91,7 @@ function getModelTheory(modelId) {
             </ul>
         `,
         nb: `
-            <h6>Naive Bayes</h6>
+            <h6><i class="fas fa-chart-bar text-secondary me-2"></i>Naive Bayes</h6>
             <p>Probabilistic classifier based on Bayes' rule and conditional independence assumptions.</p>
             <ul>
                 <li>Strong baseline for short-message text classification.</li>
@@ -89,7 +100,7 @@ function getModelTheory(modelId) {
             </ul>
         `,
         svm: `
-            <h6>Support Vector Machine</h6>
+            <h6><i class="fas fa-project-diagram text-warning me-2"></i>Support Vector Machine</h6>
             <p>Margin-based classifier that finds a separating hyperplane with maximum gap between classes.</p>
             <ul>
                 <li>Often strong on sparse high-dimensional text vectors.</li>
@@ -98,7 +109,7 @@ function getModelTheory(modelId) {
             </ul>
         `,
         lstm: `
-            <h6>LSTM (Long Short-Term Memory)</h6>
+            <h6><i class="fas fa-network-wired text-success me-2"></i>LSTM (Long Short-Term Memory)</h6>
             <p>Sequence model that keeps context through gated memory cells.</p>
             <ul>
                 <li>Captures token order and long dependencies.</li>
@@ -113,7 +124,7 @@ function getModelTheory(modelId) {
 function getModelMathematics(modelId) {
     const mathMap = {
         lr: `
-            <h6>Probability Model</h6>
+            <h6>Logistic Regression: Probability Model</h6>
             <div class="math-equation">
                 p(y=1|x) = 1 / (1 + e<sup>-(w<sup>T</sup>x + b)</sup>)
             </div>
@@ -123,7 +134,7 @@ function getModelMathematics(modelId) {
             </div>
         `,
         nb: `
-            <h6>Bayes Rule</h6>
+            <h6>Naive Bayes: Bayes Rule</h6>
             <div class="math-equation">
                 P(y|x) = P(x|y) P(y) / P(x)
             </div>
@@ -133,7 +144,7 @@ function getModelMathematics(modelId) {
             </div>
         `,
         svm: `
-            <h6>Soft-Margin Objective</h6>
+            <h6>SVM: Soft-Margin Objective</h6>
             <div class="math-equation">
                 minimize 1/2 ||w||<sup>2</sup> + C &sum; &xi;<sub>i</sub>
             </div>
@@ -143,7 +154,7 @@ function getModelMathematics(modelId) {
             </div>
         `,
         lstm: `
-            <h6>Gate Equations</h6>
+            <h6>LSTM: Gate Equations</h6>
             <div class="math-equation">
                 f<sub>t</sub> = &sigma;(W<sub>f</sub>[h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>)<br>
                 i<sub>t</sub> = &sigma;(W<sub>i</sub>[h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>i</sub>)<br>
@@ -159,20 +170,77 @@ function getModelMathematics(modelId) {
     return mathMap[modelId] || '<p>Mathematics is not available for this model.</p>';
 }
 
-function updateMetricsChartForModel(modelId) {
+function updateMetricsChartForModels(modelIds) {
     if (!window.metricsChart) return;
 
-    const modelMetrics = AppState?.modelInfo?.[modelId];
-    const values = [
-        Number(modelMetrics?.accuracy || 0),
-        Number(modelMetrics?.precision || 0),
-        Number(modelMetrics?.recall || 0),
-        Number(modelMetrics?.f1_score || 0)
-    ].map(value => Math.max(0, Math.min(100, value * 100)));
+    const palette = {
+        lr: { bg: 'rgba(59, 130, 246, 0.2)', border: 'rgba(59, 130, 246, 1)' },
+        nb: { bg: 'rgba(139, 92, 246, 0.2)', border: 'rgba(139, 92, 246, 1)' },
+        svm: { bg: 'rgba(245, 158, 11, 0.2)', border: 'rgba(245, 158, 11, 1)' },
+        lstm: { bg: 'rgba(16, 185, 129, 0.2)', border: 'rgba(16, 185, 129, 1)' }
+    };
 
-    window.metricsChart.data.datasets[0].label = `${getModelLabel(modelId)} Metrics`;
-    window.metricsChart.data.datasets[0].data = values;
+    const datasets = [];
+    let availableCount = 0;
+
+    modelIds.forEach(modelId => {
+        const modelMetrics = AppState?.modelInfo?.[modelId];
+        const values = [
+            Number(modelMetrics?.accuracy || 0),
+            Number(modelMetrics?.precision || 0),
+            Number(modelMetrics?.recall || 0),
+            Number(modelMetrics?.f1_score || 0)
+        ].map(value => Math.max(0, Math.min(100, value * 100)));
+
+        if (values.some(value => value > 0)) {
+            availableCount += 1;
+        }
+
+        const color = palette[modelId] || { bg: 'rgba(107, 114, 128, 0.2)', border: 'rgba(107, 114, 128, 1)' };
+        datasets.push({
+            label: `${getModelLabel(modelId)} Metrics`,
+            data: values,
+            backgroundColor: color.bg,
+            borderColor: color.border,
+            borderWidth: 2,
+            pointBackgroundColor: color.border,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5
+        });
+    });
+
+    if (datasets.length === 0) {
+        datasets.push({
+            label: 'No Model Selected',
+            data: [0, 0, 0, 0],
+            backgroundColor: 'rgba(107, 114, 128, 0.2)',
+            borderColor: 'rgba(107, 114, 128, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(107, 114, 128, 1)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5
+        });
+    }
+
+    window.metricsChart.data.datasets = datasets;
     window.metricsChart.update();
+
+    const infoEl = document.getElementById('modelMetricsInfo');
+    if (infoEl) {
+        if (availableCount > 0) {
+            infoEl.innerHTML = `
+                <i class="fas fa-check-circle text-success me-1"></i>
+                Showing available metrics for ${availableCount} selected model(s).
+            `;
+        } else {
+            infoEl.innerHTML = `
+                <i class="fas fa-info-circle me-1"></i>
+                Metrics are not available yet for the selected model(s).
+            `;
+        }
+    }
 }
 
 function getModelLabel(modelId) {

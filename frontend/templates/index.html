@@ -43,6 +43,12 @@
                     <div class="metric-label">F1 Score</div>
                 </div>
             </div>
+            <div class="mt-2 text-end">
+                <button class="btn btn-sm btn-outline-primary" type="button" onclick="event.stopPropagation(); showModelMetrics('lr')">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    More Metrics
+                </button>
+            </div>
         </div>
         
         <!-- Naive Bayes -->
@@ -70,6 +76,12 @@
                     <div class="metric-value">89.2%</div>
                     <div class="metric-label">F1 Score</div>
                 </div>
+            </div>
+            <div class="mt-2 text-end">
+                <button class="btn btn-sm btn-outline-primary" type="button" onclick="event.stopPropagation(); showModelMetrics('nb')">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    More Metrics
+                </button>
             </div>
         </div>
         
@@ -99,6 +111,12 @@
                     <div class="metric-label">F1 Score</div>
                 </div>
             </div>
+            <div class="mt-2 text-end">
+                <button class="btn btn-sm btn-outline-primary" type="button" onclick="event.stopPropagation(); showModelMetrics('svm')">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    More Metrics
+                </button>
+            </div>
         </div>
         
         <!-- LSTM -->
@@ -126,6 +144,12 @@
                     <div class="metric-value">96.2%</div>
                     <div class="metric-label">F1 Score</div>
                 </div>
+            </div>
+            <div class="mt-2 text-end">
+                <button class="btn btn-sm btn-outline-primary" type="button" onclick="event.stopPropagation(); showModelMetrics('lstm')">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    More Metrics
+                </button>
             </div>
         </div>
     </div>
@@ -281,6 +305,8 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-12">
+                        <h6>Summary</h6>
+                        <div id="visualizationSummary" class="p-3 bg-light rounded mb-3"></div>
                         <h6>Token Importance</h6>
                         <div id="tokenImportance" class="p-3 bg-light rounded"></div>
                     </div>

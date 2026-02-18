@@ -323,6 +323,11 @@ html[data-bs-theme="dark"] .navbar-light .form-check-label {
     border-left: 4px solid var(--accent-500);
 }
 
+.feedback-section {
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--border-color);
+}
+
 .prediction-category {
     display: inline-block;
     padding: 0.25rem 0.75rem;

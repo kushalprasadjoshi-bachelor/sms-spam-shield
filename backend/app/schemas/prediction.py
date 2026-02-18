@@ -70,3 +70,4 @@ class PredictionResponse(BaseModel):
 
 class CompareRequest(BaseModel):
     sms: str = Field(..., min_length=1, max_length=1000)
+    models: List[ModelType] = Field(default_factory=list)
