@@ -215,7 +215,7 @@ Test API endpoints manually with curl or Postman.
 
 ## 📝 License
 
-**All Rights Reserved** © 2024 Cosmos College of Management & Technology.
+**All Rights Reserved** © 2026 Cosmos College of Management & Technology.
 
 This project is developed for academic purposes as part of the Artificial Intelligence (CMP 346) course. Unauthorized reproduction, distribution, or commercial use is prohibited without written permission from the college and the project authors.
 
