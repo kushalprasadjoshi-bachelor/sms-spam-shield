@@ -1,6 +1,10 @@
 // Main application JavaScript for SMS Spam Shield
 
 const AVAILABLE_MODELS = ['lr', 'nb', 'svm', 'lstm'];
+const sidebarState = {
+    leftCollapsed: localStorage.getItem('leftSidebarCollapsed') === 'true',
+    rightCollapsed: localStorage.getItem('rightSidebarCollapsed') === 'true'
+};
 
 // Application state
 const AppState = {
@@ -103,6 +107,75 @@ function getAssistantForMessage(messageId) {
     return AppState.chatHistory.find(msg => msg.id === messageId && msg.type === 'assistant');
 }
 
+function setShellHeights() {
+    const navbar = document.getElementById('topNavbar');
+    const footer = document.querySelector('.footer');
+    const navbarHeight = navbar ? navbar.offsetHeight : 56;
+    const footerHeight = footer ? footer.offsetHeight : 120;
+
+    document.documentElement.style.setProperty('--navbar-height', `${navbarHeight}px`);
+    document.documentElement.style.setProperty('--footer-height', `${footerHeight}px`);
+}
+
+function setNavbarScrolledState() {
+    const navbar = document.getElementById('topNavbar');
+    if (!navbar) return;
+    const leftSidebar = document.getElementById('leftSidebar');
+    const rightSidebar = document.getElementById('rightSidebar');
+    const chatMessages = document.getElementById('chatMessages');
+    const hasInternalScroll =
+        (leftSidebar && leftSidebar.scrollTop > 12) ||
+        (rightSidebar && rightSidebar.scrollTop > 12) ||
+        (chatMessages && chatMessages.scrollTop > 12);
+
+    if (window.scrollY > 12 || hasInternalScroll) {
+        navbar.classList.add('navbar-scrolled');
+    } else {
+        navbar.classList.remove('navbar-scrolled');
+    }
+}
+
+function applySidebarLayout() {
+    const leftSidebar = document.getElementById('leftSidebar');
+    const rightSidebar = document.getElementById('rightSidebar');
+    const mainContent = document.getElementById('mainContent');
+    const leftBtn = document.getElementById('toggleLeftSidebar');
+    const rightBtn = document.getElementById('toggleRightSidebar');
+    if (!leftSidebar || !rightSidebar || !mainContent) return;
+
+    leftSidebar.classList.toggle('d-none', sidebarState.leftCollapsed);
+    rightSidebar.classList.toggle('d-none', sidebarState.rightCollapsed);
+
+    mainContent.classList.remove('col-md-6', 'col-lg-8', 'col-md-9', 'col-lg-10', 'col-12');
+    if (sidebarState.leftCollapsed && sidebarState.rightCollapsed) {
+        mainContent.classList.add('col-12');
+    } else if (sidebarState.leftCollapsed || sidebarState.rightCollapsed) {
+        mainContent.classList.add('col-md-9', 'col-lg-10');
+    } else {
+        mainContent.classList.add('col-md-6', 'col-lg-8');
+    }
+
+    if (leftBtn) {
+        leftBtn.classList.toggle('btn-primary', !sidebarState.leftCollapsed);
+        leftBtn.classList.toggle('btn-outline-secondary', sidebarState.leftCollapsed);
+    }
+    if (rightBtn) {
+        rightBtn.classList.toggle('btn-primary', !sidebarState.rightCollapsed);
+        rightBtn.classList.toggle('btn-outline-secondary', sidebarState.rightCollapsed);
+    }
+}
+
+function toggleSidebar(side) {
+    if (side === 'left') {
+        sidebarState.leftCollapsed = !sidebarState.leftCollapsed;
+        localStorage.setItem('leftSidebarCollapsed', String(sidebarState.leftCollapsed));
+    } else if (side === 'right') {
+        sidebarState.rightCollapsed = !sidebarState.rightCollapsed;
+        localStorage.setItem('rightSidebarCollapsed', String(sidebarState.rightCollapsed));
+    }
+    applySidebarLayout();
+}
+
 function updateUI() {
     updateHistoryDisplay();
     updateStats();
@@ -157,7 +230,12 @@ function createHistoryItem(message) {
         <div class="history-text">${escapeHtml(text)}</div>
         <div class="d-flex justify-content-between align-items-center">
             <span class="badge bg-${categoryClass}">${escapeHtml(category)}</span>
-            <small class="text-muted">${message.time}</small>
+            <div class="d-flex align-items-center gap-2">
+                <small class="text-muted">${message.time}</small>
+                <button class="btn btn-sm btn-link text-danger p-0" title="Delete chat" onclick="deleteChat('${message.id}', event)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
         </div>
     `;
 
@@ -323,6 +401,20 @@ function clearHistory() {
     setActiveHistoryFilterButton('all');
 }
 
+function deleteChat(messageId, event = null) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    AppState.chatHistory = AppState.chatHistory.filter(msg => msg.id !== messageId);
+    AppState.save();
+    updateUI();
+
+    const threadMessages = document.querySelectorAll(`#chatMessages [data-thread-id="${messageId}"]`);
+    threadMessages.forEach(element => element.remove());
+}
+
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -362,11 +454,36 @@ function setupEventListeners() {
             }
         });
     }
+
+    const leftSidebar = document.getElementById('leftSidebar');
+    const rightSidebar = document.getElementById('rightSidebar');
+    const chatMessages = document.getElementById('chatMessages');
+    [leftSidebar, rightSidebar, chatMessages].forEach(container => {
+        if (container) {
+            container.addEventListener('scroll', setNavbarScrolledState, { passive: true });
+        }
+    });
+
+    const leftToggle = document.getElementById('toggleLeftSidebar');
+    if (leftToggle) {
+        leftToggle.addEventListener('click', () => toggleSidebar('left'));
+    }
+
+    const rightToggle = document.getElementById('toggleRightSidebar');
+    if (rightToggle) {
+        rightToggle.addEventListener('click', () => toggleSidebar('right'));
+    }
+
+    window.addEventListener('resize', setShellHeights);
+    window.addEventListener('scroll', setNavbarScrolledState, { passive: true });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     AppState.init();
     setupEventListeners();
+    applySidebarLayout();
+    setShellHeights();
+    setNavbarScrolledState();
     updateUI();
     setActiveHistoryFilterButton(AppState.historyFilter);
 });
@@ -375,6 +492,7 @@ window.toggleModel = toggleModel;
 window.selectModel = selectModel;
 window.clearChat = clearChat;
 window.clearHistory = clearHistory;
+window.deleteChat = deleteChat;
 window.filterHistory = filterHistory;
 window.loadMessageDetails = loadMessageDetails;
 window.updateHistoryDisplay = updateHistoryDisplay;

@@ -21,24 +21,24 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="app-shell">
     <!-- Navigation Bar -->
     {% include "components/navbar.html" %}
     
-    <div class="container-fluid">
-        <div class="row">
+    <div class="container-fluid app-layout">
+        <div class="row app-row" id="appRow">
             <!-- Left Sidebar - History -->
-            <div class="col-md-3 col-lg-2 sidebar-left">
+            <div class="col-md-3 col-lg-2 sidebar-left" id="leftSidebar">
                 {% include "components/left_sidebar.html" %}
             </div>
             
             <!-- Main Content -->
-            <main class="col-md-6 col-lg-8 main-content">
+            <main class="col-md-6 col-lg-8 main-content" id="mainContent">
                 {% block content %}{% endblock %}
             </main>
             
             <!-- Right Sidebar - Model Theory -->
-            <div class="col-md-3 col-lg-2 sidebar-right">
+            <div class="col-md-3 col-lg-2 sidebar-right" id="rightSidebar">
                 {% include "components/right_sidebar.html" %}
             </div>
         </div>

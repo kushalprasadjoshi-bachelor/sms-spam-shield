@@ -53,8 +53,14 @@ async def predict_sms(request: PredictionRequest):
             explanation_obj = None
             exp = pred.get("explanation")
             if request.include_explanation and isinstance(exp, dict):
+                token_items = exp.get("important_tokens", [])
                 explanation_obj = Explanation(
-                    important_tokens=[t["word"] for t in exp.get("important_tokens", [])],
+                    important_tokens=[t["word"] for t in token_items if isinstance(t, dict) and "word" in t],
+                    feature_importance={
+                        str(t.get("word")): float(t.get("importance", 0.0))
+                        for t in token_items
+                        if isinstance(t, dict) and "word" in t
+                    },
                     confidence=pred["confidence"],
                     method=exp.get("method", "unknown")
                 )
@@ -122,8 +128,14 @@ async def ensemble_predict(
             explanation_obj = None
             exp = ind.get("explanation")
             if request.include_explanation and isinstance(exp, dict):
+                token_items = exp.get("important_tokens", [])
                 explanation_obj = Explanation(
-                    important_tokens=[t["word"] for t in exp.get("important_tokens", [])],
+                    important_tokens=[t["word"] for t in token_items if isinstance(t, dict) and "word" in t],
+                    feature_importance={
+                        str(t.get("word")): float(t.get("importance", 0.0))
+                        for t in token_items
+                        if isinstance(t, dict) and "word" in t
+                    },
                     confidence=ind["confidence"],
                     method=exp.get("method", "unknown")
                 )

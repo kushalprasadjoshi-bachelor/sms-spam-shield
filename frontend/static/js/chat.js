@@ -61,6 +61,9 @@ function appendMessageToChat(message) {
     // Scroll to bottom
     setTimeout(() => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (typeof setNavbarScrolledState === 'function') {
+            setNavbarScrolledState();
+        }
     }, 100);
 }
 
@@ -68,7 +71,8 @@ function appendMessageToChat(message) {
 function createMessageElement(message) {
     const div = document.createElement('div');
     div.className = `message ${message.type} animate-slide-in`;
-    div.id = `message-${message.id}`;
+    div.id = `message-${message.type}-${message.id}`;
+    div.setAttribute('data-thread-id', message.id);
     
     if (message.type === 'user') {
         div.innerHTML = `
@@ -165,7 +169,12 @@ function createMessageElement(message) {
                         <i class="fas fa-robot text-primary"></i>
                         SMS Spam Shield
                     </div>
-                    <div class="message-time">${message.time}</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="message-time">${message.time}</div>
+                        <button class="btn btn-sm btn-link text-danger p-0" title="Delete chat" onclick="deleteChat('${message.id}', event)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="message-text">
                     <div class="prediction-result">
@@ -330,11 +339,16 @@ function formatPredictionResult(apiResult) {
     if (apiResult.individual_predictions && apiResult.individual_predictions.length > 0) {
         const explainerPrediction = apiResult.individual_predictions.find(pred => pred.explanation);
         if (explainerPrediction && explainerPrediction.explanation) {
+            const importantWords = explainerPrediction.explanation.important_tokens || [];
+            const importanceMap = explainerPrediction.explanation.feature_importance || {};
             result.explanation = {
                 method: explainerPrediction.explanation.method || 'unknown',
-                tokens: (explainerPrediction.explanation.important_tokens || []).map((token, index) => ({
+                tokens: importantWords.map((token, index) => ({
                     word: token,
-                    importance: Math.max(0.1, 0.9 - (index * 0.08))
+                    importance: Math.max(
+                        0.08,
+                        Number(importanceMap[token] || 0) || Math.max(0.1, 0.9 - (index * 0.08))
+                    )
                 })),
                 text: `Important words influencing the prediction (${explainerPrediction.model.toUpperCase()}):`
             };

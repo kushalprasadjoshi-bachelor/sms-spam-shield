@@ -123,6 +123,108 @@ class ModelMetadata:
             logger.error(f"Failed to load model {self.model_type.value}: {str(e)}")
             self.loaded = False
 
+    def _fallback_tokens_from_text(
+        self,
+        processed_text: str,
+        raw_text: Optional[str] = None,
+        max_tokens: int = 10
+    ) -> List[Dict[str, float]]:
+        source = processed_text.strip() if isinstance(processed_text, str) else ""
+        if not source and isinstance(raw_text, str):
+            source = raw_text.strip().lower()
+
+        if not source:
+            return []
+
+        cleaned = ''.join(ch if ch.isalnum() or ch.isspace() else ' ' for ch in source)
+        tokens = [token for token in cleaned.split() if token][:max_tokens]
+        if not tokens:
+            return []
+
+        base = 1.0
+        step = 0.08
+        return [
+            {"word": token, "importance": max(0.1, base - index * step)}
+            for index, token in enumerate(tokens)
+        ]
+
+    def _build_token_level_explanation(
+        self,
+        features,
+        processed_text: str,
+        raw_text: Optional[str] = None,
+        pred_idx: Optional[int] = None
+    ) -> Dict[str, Any]:
+        if self.vectorizer is None:
+            return {
+                "method": "token_frequency",
+                "important_tokens": self._fallback_tokens_from_text(processed_text, raw_text)
+            }
+
+        if not hasattr(self.vectorizer, "get_feature_names_out"):
+            return {
+                "method": "token_frequency",
+                "important_tokens": self._fallback_tokens_from_text(processed_text, raw_text)
+            }
+
+        feature_names = self.vectorizer.get_feature_names_out()
+        if not hasattr(features, "nonzero"):
+            return {
+                "method": "token_frequency",
+                "important_tokens": self._fallback_tokens_from_text(processed_text, raw_text)
+            }
+
+        nonzero_indices = features.nonzero()[1]
+        if len(nonzero_indices) == 0:
+            return {
+                "method": "token_frequency",
+                "important_tokens": self._fallback_tokens_from_text(processed_text, raw_text)
+            }
+
+        feature_values = features.data if hasattr(features, "data") else np.ones(len(nonzero_indices))
+        raw_scores = np.array(feature_values, dtype=float)
+        method = "token_weight"
+
+        if hasattr(self.model, "coef_"):
+            coef = self.model.coef_
+            method = "linear_contribution"
+            if coef.ndim == 2:
+                if coef.shape[0] == 1:
+                    class_coef = coef[0]
+                else:
+                    class_idx = pred_idx if pred_idx is not None and pred_idx < coef.shape[0] else 0
+                    class_coef = coef[class_idx]
+                raw_scores = np.array(feature_values, dtype=float) * class_coef[nonzero_indices]
+        elif hasattr(self.model, "feature_log_prob_"):
+            log_prob = self.model.feature_log_prob_
+            method = "naive_bayes_log_prob"
+            class_idx = pred_idx if pred_idx is not None and pred_idx < log_prob.shape[0] else 0
+            raw_scores = np.array(feature_values, dtype=float) * log_prob[class_idx][nonzero_indices]
+
+        token_scores: Dict[str, float] = {}
+        for feature_index, raw_score in zip(nonzero_indices, raw_scores):
+            token = str(feature_names[feature_index])
+            token_scores[token] = token_scores.get(token, 0.0) + float(abs(raw_score))
+
+        if not token_scores:
+            fallback_tokens = self._fallback_tokens_from_text(processed_text, raw_text)
+            return {"method": method, "important_tokens": fallback_tokens}
+
+        sorted_tokens = sorted(token_scores.items(), key=lambda item: item[1], reverse=True)[:12]
+        max_score = sorted_tokens[0][1] if sorted_tokens else 1.0
+        important_tokens = [
+            {
+                "word": token,
+                "importance": (score / max_score) if max_score > 0 else 0.0
+            }
+            for token, score in sorted_tokens
+        ]
+
+        return {
+            "method": method,
+            "important_tokens": important_tokens
+        }
+
     def predict(self, text: str, include_explanation: bool = False) -> Optional[Dict[str, Any]]:
         if not self.loaded:
             logger.error(f"Model {self.model_type.value} is not loaded")
@@ -192,6 +294,13 @@ class ModelMetadata:
                         "confidence": confidence,
                         "probabilities": probabilities
                     }
+                    if include_explanation:
+                        result["explanation"] = self._build_token_level_explanation(
+                            features,
+                            processed_text,
+                            raw_text=text,
+                            pred_idx=int(pred_idx)
+                        )
                     return result
             
                 else:
@@ -205,11 +314,20 @@ class ModelMetadata:
                     else:
                         probabilities = proba.tolist()
 
+                    pred_idx = int(np.argmax(proba)) if len(proba) > 0 else None
+
                     result = {
                         "prediction": str(prediction),
                         "confidence": confidence,
                         "probabilities": probabilities
                     }
+                    if include_explanation:
+                        result["explanation"] = self._build_token_level_explanation(
+                            features,
+                            processed_text,
+                            raw_text=text,
+                            pred_idx=pred_idx
+                        )
                     return result
 
         except Exception as e:
