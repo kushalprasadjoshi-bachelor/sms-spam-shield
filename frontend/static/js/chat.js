@@ -144,7 +144,7 @@ function createMessageElement(message) {
         
         // Format explanation
         let explanationHtml = '';
-        if (result.explanation && ((result.explanation.tokens || []).length > 0 || result.explanation.text)) {
+        if (result.explanation && (result.explanation.tokens || []).length > 0) {
             const tokensHtml = (result.explanation.tokens || [])
                 .map(token => `
                     <span class="badge bg-info me-1 mb-1" title="Importance: ${(token.importance * 100).toFixed(1)}%">
@@ -156,7 +156,7 @@ function createMessageElement(message) {
             explanationHtml = `
                 <div class="explanation mt-3">
                     <h6>AI Explanation:</h6>
-                    ${tokensHtml ? `<div class="explanation-tokens mb-2">${tokensHtml}</div>` : ''}
+                    <div class="explanation-tokens mb-2">${tokensHtml}</div>
                     <p class="mt-2 small">${result.explanation.text || 'These words contributed most to the prediction.'}</p>
                 </div>
             `;
@@ -259,13 +259,6 @@ async function predictSMS() {
         
         // Format result for display
         const formattedResult = formatPredictionResult(result);
-        if (includeExplanation && !formattedResult.explanation) {
-            formattedResult.explanation = {
-                tokens: [],
-                text: 'No token-level explanation was produced by the selected model(s) for this message.'
-            };
-        }
-        
         // Add assistant message
         addAssistantMessage(messageId, formattedResult);
         
@@ -339,19 +332,23 @@ function formatPredictionResult(apiResult) {
     if (apiResult.individual_predictions && apiResult.individual_predictions.length > 0) {
         const explainerPrediction = apiResult.individual_predictions.find(pred => pred.explanation);
         if (explainerPrediction && explainerPrediction.explanation) {
-            const importantWords = explainerPrediction.explanation.important_tokens || [];
-            const importanceMap = explainerPrediction.explanation.feature_importance || {};
-            result.explanation = {
-                method: explainerPrediction.explanation.method || 'unknown',
-                tokens: importantWords.map((token, index) => ({
-                    word: token,
-                    importance: Math.max(
-                        0.08,
-                        Number(importanceMap[token] || 0) || Math.max(0.1, 0.9 - (index * 0.08))
-                    )
-                })),
-                text: `Important words influencing the prediction (${explainerPrediction.model.toUpperCase()}):`
-            };
+            const normalizedExplanation = normalizeExplanationData(explainerPrediction.explanation);
+            const importantWords = normalizedExplanation.importantWords;
+            const importanceMap = normalizedExplanation.importanceMap;
+
+            if (importantWords.length > 0) {
+                result.explanation = {
+                    method: explainerPrediction.explanation.method || 'unknown',
+                    tokens: importantWords.map((token, index) => ({
+                        word: token,
+                        importance: Math.max(
+                            0.08,
+                            Number(importanceMap[token] || 0) || Math.max(0.1, 0.9 - (index * 0.08))
+                        )
+                    })),
+                    text: `Important words influencing the prediction (${explainerPrediction.model.toUpperCase()}):`
+                };
+            }
         }
     }
     
@@ -370,6 +367,66 @@ function formatPredictionResult(apiResult) {
     }
     
     return result;
+}
+
+function normalizeExplanationData(explanation) {
+    const tokenItems = Array.isArray(explanation?.important_tokens)
+        ? explanation.important_tokens
+        : [];
+    const rawMap = explanation?.feature_importance && typeof explanation.feature_importance === 'object'
+        ? explanation.feature_importance
+        : {};
+
+    const importantWords = [];
+    const importanceMap = {};
+
+    Object.entries(rawMap).forEach(([token, score]) => {
+        const word = String(token || '').trim();
+        if (!word) return;
+        const numericScore = Number(score);
+        importanceMap[word] = Number.isFinite(numericScore) ? numericScore : 0;
+    });
+
+    tokenItems.forEach(item => {
+        if (typeof item === 'string') {
+            const word = item.trim();
+            if (word) importantWords.push(word);
+            return;
+        }
+
+        if (item && typeof item === 'object') {
+            const word = String(item.word || '').trim();
+            if (!word) return;
+            importantWords.push(word);
+            const numericScore = Number(item.importance);
+            if (Number.isFinite(numericScore)) {
+                importanceMap[word] = numericScore;
+            }
+        }
+    });
+
+    const dedupedWords = [];
+    const seen = new Set();
+    importantWords.forEach(word => {
+        if (seen.has(word)) return;
+        seen.add(word);
+        dedupedWords.push(word);
+    });
+
+    if (dedupedWords.length === 0 && Object.keys(importanceMap).length > 0) {
+        return {
+            importantWords: Object.entries(importanceMap)
+                .sort((a, b) => Number(b[1]) - Number(a[1]))
+                .slice(0, 12)
+                .map(([token]) => token),
+            importanceMap
+        };
+    }
+
+    return {
+        importantWords: dedupedWords.slice(0, 12),
+        importanceMap
+    };
 }
 
 // Format model name for display

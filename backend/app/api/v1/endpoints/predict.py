@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 import time
+from typing import Any, Dict, List, Tuple
 
 from ....schemas.prediction import (
     PredictionRequest,
@@ -13,6 +14,56 @@ from ....core.logger import logger
 from ....services.monitoring_service import monitoring_service
 
 router = APIRouter()
+
+
+def _normalize_explanation_tokens(exp: Dict[str, Any]) -> Tuple[List[str], Dict[str, float]]:
+    """Normalize explanation payloads that may contain token strings or token objects."""
+    token_items = exp.get("important_tokens", [])
+    important_tokens: List[str] = []
+    feature_importance: Dict[str, float] = {}
+
+    if isinstance(token_items, list):
+        for item in token_items:
+            if isinstance(item, dict):
+                word = str(item.get("word", "")).strip()
+                if not word:
+                    continue
+                important_tokens.append(word)
+                try:
+                    feature_importance[word] = float(item.get("importance", 0.0))
+                except (TypeError, ValueError):
+                    continue
+            elif isinstance(item, str):
+                word = item.strip()
+                if word:
+                    important_tokens.append(word)
+
+    raw_feature_importance = exp.get("feature_importance", {})
+    if isinstance(raw_feature_importance, dict):
+        for token, score in raw_feature_importance.items():
+            word = str(token).strip()
+            if not word:
+                continue
+            try:
+                feature_importance[word] = float(score)
+            except (TypeError, ValueError):
+                continue
+
+    if important_tokens:
+        deduped_tokens: List[str] = []
+        seen = set()
+        for token in important_tokens:
+            if token in seen:
+                continue
+            seen.add(token)
+            deduped_tokens.append(token)
+            if len(deduped_tokens) >= 12:
+                break
+        important_tokens = deduped_tokens
+    elif feature_importance:
+        important_tokens = list(feature_importance.keys())[:12]
+
+    return important_tokens, feature_importance
 
 
 @router.get("/models")
@@ -53,14 +104,10 @@ async def predict_sms(request: PredictionRequest):
             explanation_obj = None
             exp = pred.get("explanation")
             if request.include_explanation and isinstance(exp, dict):
-                token_items = exp.get("important_tokens", [])
+                important_tokens, feature_importance = _normalize_explanation_tokens(exp)
                 explanation_obj = Explanation(
-                    important_tokens=[t["word"] for t in token_items if isinstance(t, dict) and "word" in t],
-                    feature_importance={
-                        str(t.get("word")): float(t.get("importance", 0.0))
-                        for t in token_items
-                        if isinstance(t, dict) and "word" in t
-                    },
+                    important_tokens=important_tokens,
+                    feature_importance=feature_importance,
                     confidence=pred["confidence"],
                     method=exp.get("method", "unknown")
                 )
@@ -128,14 +175,10 @@ async def ensemble_predict(
             explanation_obj = None
             exp = ind.get("explanation")
             if request.include_explanation and isinstance(exp, dict):
-                token_items = exp.get("important_tokens", [])
+                important_tokens, feature_importance = _normalize_explanation_tokens(exp)
                 explanation_obj = Explanation(
-                    important_tokens=[t["word"] for t in token_items if isinstance(t, dict) and "word" in t],
-                    feature_importance={
-                        str(t.get("word")): float(t.get("importance", 0.0))
-                        for t in token_items
-                        if isinstance(t, dict) and "word" in t
-                    },
+                    important_tokens=important_tokens,
+                    feature_importance=feature_importance,
                     confidence=ind["confidence"],
                     method=exp.get("method", "unknown")
                 )

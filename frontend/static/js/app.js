@@ -117,6 +117,24 @@ function setShellHeights() {
     document.documentElement.style.setProperty('--footer-height', `${footerHeight}px`);
 }
 
+function applyFooterState() {
+    const footer = document.getElementById('appFooter');
+    const showBtn = document.getElementById('showFooterBtn');
+    if (!footer || !showBtn) return;
+
+    const hidden = localStorage.getItem('footerHidden') === 'true';
+    footer.classList.toggle('d-none', hidden);
+    showBtn.classList.toggle('d-none', !hidden);
+    setShellHeights();
+}
+
+function toggleFooter(show = null) {
+    const currentHidden = localStorage.getItem('footerHidden') === 'true';
+    const nextHidden = show === null ? !currentHidden : !show;
+    localStorage.setItem('footerHidden', String(nextHidden));
+    applyFooterState();
+}
+
 function setNavbarScrolledState() {
     const navbar = document.getElementById('topNavbar');
     if (!navbar) return;
@@ -482,6 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
     AppState.init();
     setupEventListeners();
     applySidebarLayout();
+    applyFooterState();
     setShellHeights();
     setNavbarScrolledState();
     updateUI();
@@ -498,3 +517,4 @@ window.loadMessageDetails = loadMessageDetails;
 window.updateHistoryDisplay = updateHistoryDisplay;
 window.updateModelSelectionUI = updateModelSelectionUI;
 window.setupEventListeners = setupEventListeners;
+window.toggleFooter = toggleFooter;
