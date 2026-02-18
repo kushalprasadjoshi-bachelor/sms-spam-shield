@@ -1,26 +1,25 @@
 from fastapi import APIRouter, HTTPException
-from typing import List
 
-from backend.app.schemas.prediction import ModelType
-from backend.app.services.model_manager import model_manager
-from backend.app.core.logger import logger
+from ....schemas.prediction import CompareRequest
+from ....services.model_manager import model_manager
+from ....core.logger import logger
 
 router = APIRouter()
 
 
 @router.post("/compare")
-async def compare_model_predictions(sms: str):
+async def compare_model_predictions(request: CompareRequest):
     """
     Compare predictions from all loaded models for the same SMS.
-    
+
     - **sms**: SMS text to classify with all models
     """
     try:
+        sms = request.sms
         logger.info(f"Model comparison request for SMS: {sms[:100]}...")
-        
+
         results = model_manager.compare_models(sms)
-        
-        # Format response
+
         formatted_results = []
         for model_name, result in results["comparison"].items():
             formatted_results.append({
@@ -28,9 +27,10 @@ async def compare_model_predictions(sms: str):
                 "prediction": result["prediction"],
                 "confidence": result["confidence"],
                 "status": result["status"],
-                "error": result.get("error")
+                "error": result.get("error"),
+                "params": result.get("params")
             })
-        
+
         return {
             "sms": sms,
             "comparison": formatted_results,
@@ -40,7 +40,7 @@ async def compare_model_predictions(sms: str):
                 "successful_models": results["successful_models"]
             }
         }
-        
+
     except Exception as e:
         logger.error(f"Model comparison failed: {str(e)}")
         raise HTTPException(
@@ -59,14 +59,14 @@ async def get_ensemble_methods():
             {
                 "id": "weighted_voting",
                 "name": "Weighted Voting",
-                "description": "Each model's vote is weighted by its confidence score",
-                "formula": "score(pred) = Σ confidence_i for each model_i predicting pred"
+                "description": "Each model vote is weighted by its confidence score",
+                "formula": "score(pred) = sum(confidence_i for models predicting pred)"
             },
             {
                 "id": "averaging",
                 "name": "Probability Averaging",
                 "description": "Average probability distributions from all models",
-                "formula": "P_avg(c) = (1/n) Σ P_i(c) for i=1..n models"
+                "formula": "P_avg(c) = (1/n) * sum(P_i(c)) for i=1..n models"
             },
             {
                 "id": "majority_voting",

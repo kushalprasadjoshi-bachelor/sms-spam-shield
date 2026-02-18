@@ -8,10 +8,10 @@ from pathlib import Path
 import tensorflow as tf
 from enum import Enum
 
-from backend.app.core.config import settings
-from backend.app.core.logger import logger
-from backend.app.schemas.prediction import ModelType
-from backend.app.services.preprocessing import preprocessor
+from ..core.config import settings
+from ..core.logger import logger
+from ..schemas.prediction import ModelType
+from .preprocessing import preprocessor
 
 
 def _load_lstm_trainer():
@@ -78,8 +78,7 @@ class ModelMetadata:
 
                 encoder_file = model_path / "label_encoder.pkl"
                 if encoder_file.exists():
-                    with open(encoder_file, 'rb') as f:
-                        self.label_encoder = joblib.load(f)
+                    self.label_encoder = joblib.load(encoder_file)
 
                 metadata_file = model_path / "metadata.json"
                 if metadata_file.exists():
@@ -183,6 +182,13 @@ class ModelMetadata:
                         }
                     else:
                         probabilities = proba.tolist()
+
+                    result = {
+                        "prediction": str(prediction),
+                        "confidence": confidence,
+                        "probabilities": probabilities
+                    }
+                    return result
 
         except Exception as e:
             logger.error(f"Prediction failed for {self.model_type.value}: {str(e)}")

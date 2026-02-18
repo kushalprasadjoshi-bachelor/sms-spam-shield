@@ -4,14 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-import os
+from pathlib import Path
 
-from backend.app.core.config import settings
-from backend.app.core.logger import logger
-from backend.app.api.v1.endpoints import predict, health
-from backend.app.services.model_manager import model_manager
-from backend.app.api.v1.endpoints import predict, health, compare 
-from backend.app.api.v1.endpoints import monitoring
+from .core.config import settings
+from .core.logger import logger
+from .api.v1.endpoints import predict, health, compare, monitoring, models
+from .services.model_manager import model_manager
 
 # Create FastAPI app
 app = FastAPI(
@@ -31,22 +29,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+project_root = Path(__file__).resolve().parents[2]
+
 # Mount static files if they exist
-frontend_static_path = os.path.join(os.path.dirname(__file__), "../../frontend/static")
+frontend_static_path = project_root / "frontend" / "static"
 logger.info(f"Static path: {frontend_static_path}")
-logger.info(f"Static path exists: {os.path.exists(frontend_static_path)}")
-if os.path.exists(frontend_static_path):
-    app.mount("/static", StaticFiles(directory=frontend_static_path), name="static")
+logger.info(f"Static path exists: {frontend_static_path.exists()}")
+if frontend_static_path.exists():
+    app.mount("/static", StaticFiles(directory=str(frontend_static_path)), name="static")
 
 # Templates
-templates_path = os.path.join(os.path.dirname(__file__), "../../frontend/templates")
-templates = Jinja2Templates(directory=templates_path) if os.path.exists(templates_path) else None
+templates_path = project_root / "frontend" / "templates"
+templates = Jinja2Templates(directory=str(templates_path)) if templates_path.exists() else None
 
 # Include routers
 app.include_router(predict.router, prefix=settings.API_V1_PREFIX)
 app.include_router(health.router, prefix=settings.API_V1_PREFIX)
 app.include_router(compare.router, prefix=settings.API_V1_PREFIX)
 app.include_router(monitoring.router, prefix=settings.API_V1_PREFIX)
+app.include_router(models.router, prefix=settings.API_V1_PREFIX)
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend(request: Request):

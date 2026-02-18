@@ -1,9 +1,8 @@
-from fastapi import APIRouter, HTTPException, Query
-from typing import Optional
+from fastapi import APIRouter, HTTPException
 
-from backend.app.services.model_manager import model_manager
-from backend.app.schemas.prediction import ModelType
-from backend.app.core.logger import logger
+from ....services.model_manager import model_manager
+from ....schemas.prediction import ModelType
+from ....core.logger import logger
 
 router = APIRouter()
 

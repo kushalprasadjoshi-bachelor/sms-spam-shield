@@ -26,9 +26,10 @@ class PredictionRequest(BaseModel):
 
 
 class Explanation(BaseModel):
-    important_tokens: List[str] = []
-    feature_importance: Dict[str, float] = {}
+    important_tokens: List[str] = Field(default_factory=list)
+    feature_importance: Dict[str, float] = Field(default_factory=dict)
     confidence: float = 0.0
+    method: str = "unknown"
 
 
 class ModelPrediction(BaseModel):
@@ -42,7 +43,7 @@ class PredictionResponse(BaseModel):
     sms: str
     ensemble_prediction: Optional[str] = None
     ensemble_confidence: Optional[float] = None
-    individual_predictions: List[ModelPrediction] = []
+    individual_predictions: List[ModelPrediction] = Field(default_factory=list)
     processing_time_ms: float
     
     class Config:
@@ -65,3 +66,7 @@ class PredictionResponse(BaseModel):
                 "processing_time_ms": 45.2
             }
         }
+
+
+class CompareRequest(BaseModel):
+    sms: str = Field(..., min_length=1, max_length=1000)

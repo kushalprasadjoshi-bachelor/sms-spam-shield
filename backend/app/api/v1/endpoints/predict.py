@@ -1,17 +1,16 @@
 from fastapi import APIRouter, HTTPException
 import time
-from typing import List
 
-from backend.app.schemas.prediction import (
+from ....schemas.prediction import (
     PredictionRequest,
     PredictionResponse,
     ModelPrediction,
     Explanation,
     ModelType
 )
-from backend.app.services.model_manager import model_manager
-from backend.app.core.logger import logger
-from backend.app.services.monitoring_service import monitoring_service
+from ....services.model_manager import model_manager
+from ....core.logger import logger
+from ....services.monitoring_service import monitoring_service
 
 router = APIRouter()
 
@@ -43,12 +42,17 @@ async def predict_sms(request: PredictionRequest):
             model_types=request.models,
             include_explanation=request.include_explanation
         )
+        if not prediction_result["individual_predictions"]:
+            raise HTTPException(
+                status_code=503,
+                detail="No selected models are loaded or predictions failed"
+            )
 
         individual_predictions = []
         for pred in prediction_result["individual_predictions"]:
             explanation_obj = None
-            if request.include_explanation and "explanation" in pred:
-                exp = pred["explanation"]
+            exp = pred.get("explanation")
+            if request.include_explanation and isinstance(exp, dict):
                 explanation_obj = Explanation(
                     important_tokens=[t["word"] for t in exp.get("important_tokens", [])],
                     confidence=pred["confidence"],
@@ -73,11 +77,12 @@ async def predict_sms(request: PredictionRequest):
         )
 
         # Record for monitoring
-        monitoring_service.record_prediction(
-            model='ensemble',
-            category=response.ensemble_prediction or "unknown",
-            confidence=response.ensemble_confidence or 0.0
-        )
+        if response.ensemble_prediction is not None:
+            monitoring_service.record_prediction(
+                model="ensemble",
+                category=response.ensemble_prediction,
+                confidence=response.ensemble_confidence or 0.0
+            )
         for ind in individual_predictions:
             monitoring_service.record_prediction(
                 model=ind.model.value,
@@ -88,6 +93,8 @@ async def predict_sms(request: PredictionRequest):
         logger.info(f"Prediction completed in {processing_time:.2f}ms")
         return response
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Prediction error: {str(e)}")
         raise HTTPException(
@@ -129,6 +136,8 @@ async def ensemble_predict(
             processing_time_ms=processing_time
         )
         return response
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Ensemble prediction error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
