@@ -172,6 +172,26 @@
 % % Change the listing name
 \renewcommand{\lstlistingname}{Code} % Changes "Listing" to "Code"
 
+% Define JSON language manually for listings
+\lstdefinelanguage{json}{
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{gray!10},
+    string=[s]{"}{"},
+    stringstyle=\color{blue},
+    comment=[l]{//},
+    commentstyle=\color{green!60!black},
+    morecomment=[s]{/*}{*/},
+    morekeywords={true,false,null},
+    keywordstyle=\color{red}\bfseries
+}
+
 % ---------------------- GRAPHICS CONFIGURATION ---------------------
 % Automatically search for images inside the path defined by \IMGPATH
 \graphicspath{{\IMGPATH}}
