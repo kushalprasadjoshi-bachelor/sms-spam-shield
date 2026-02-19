@@ -14,11 +14,19 @@ async function refreshDashboard() {
         const categoryDist = data.category_distribution || {};
         const avgConf = data.average_confidence || {};
         const throughputData = data.throughput || [];
-        const accuracy = data.accuracy;
+        const rawAccuracy = data.accuracy;
         const feedbackStats = data.feedback_stats || {};
         const totalCorrections = feedbackStats.total_corrections || 0;
         const totalFeedback = feedbackStats.total_feedback || 0;
+        const totalConfirmedCorrect = feedbackStats.total_confirmed_correct || 0;
         const correctionsByModel = feedbackStats.corrections_by_model || {};
+        const normalizedAccuracy = (rawAccuracy !== null && rawAccuracy !== undefined && Number.isFinite(Number(rawAccuracy)))
+            ? Number(rawAccuracy)
+            : null;
+        const feedbackAccuracy = totalFeedback > 0
+            ? totalConfirmedCorrect / totalFeedback
+            : null;
+        const accuracy = normalizedAccuracy ?? feedbackAccuracy;
 
         // Update cards
         const dashboardCards = document.getElementById('dashboard-cards');
@@ -36,7 +44,7 @@ async function refreshDashboard() {
                     <div class="card text-white bg-success mb-3">
                         <div class="card-body">
                             <h5 class="card-title">Accuracy</h5>
-                            <p class="card-text display-6">${accuracy ? (accuracy * 100).toFixed(1) + '%' : 'N/A'}</p>
+                            <p class="card-text display-6">${accuracy !== null ? (accuracy * 100).toFixed(1) + '%' : 'N/A'}</p>
                         </div>
                     </div>
                 </div>
@@ -77,9 +85,9 @@ async function refreshDashboard() {
             throughputChart = new Chart(throughputCtx, {
                 type: 'line',
                 data: {
-                    labels: throughputData.map(d => new Date(d.time * 1000).toLocaleTimeString()),
+                    labels: throughputData.map(d => new Date(d.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
                     datasets: [{
-                        label: 'Predictions per 6s',
+                        label: 'Predictions per minute',
                         data: throughputData.map(d => d.count),
                         borderColor: '#3b82f6',
                         tension: 0.1

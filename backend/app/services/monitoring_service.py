@@ -29,22 +29,28 @@ class MonitoringService:
             cat_counts = {}
             confidences = {}
             correct_count = 0
+            labeled_count = 0
 
             for p in self.recent:
                 model_counts[p['model']] = model_counts.get(p['model'], 0) + 1
                 cat_counts[p['category']] = cat_counts.get(p['category'], 0) + 1
                 confidences.setdefault(p['model'], []).append(p['confidence'])
-                if p['correct']:
+
+                correct_value = p.get('correct')
+                if correct_value is True:
                     correct_count += 1
+                    labeled_count += 1
+                elif correct_value is False:
+                    labeled_count += 1
 
             avg_conf = {m: sum(v)/len(v) for m, v in confidences.items()}
-            accuracy = correct_count / total if correct_count > 0 else None
+            accuracy = correct_count / labeled_count if labeled_count > 0 else None
 
             now = time.time()
             throughput = []
-            for i in range(10):
-                start = now - (i+1)*6
-                end = now - i*6
+            for i in range(60):
+                start = now - (i + 1) * 60
+                end = now - i * 60
                 cnt = sum(1 for p in self.recent if start <= p['timestamp'] < end)
                 throughput.append({'time': end, 'count': cnt})
 

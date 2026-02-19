@@ -28,9 +28,6 @@ function addUserMessage(text) {
 
 // Add assistant message to chat
 function addAssistantMessage(messageId, result) {
-    const hasPreviousAssistantPrediction = AppState.chatHistory.some(
-        msg => msg.type === 'assistant' && msg.result
-    );
     const normalizedResult = {
         ...result,
         prediction_id: result?.prediction_id || messageId
@@ -39,7 +36,7 @@ function addAssistantMessage(messageId, result) {
     const message = {
         id: messageId,
         type: 'assistant',
-        time: hasPreviousAssistantPrediction ? formatTime() : 'Just now',
+        time: formatTime(),
         result: normalizedResult
     };
     
@@ -613,6 +610,14 @@ function getModelColor(modelCode) {
 
 // Show alert message
 function showAlert(message, type = 'info') {
+    let container = document.getElementById('alertContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'alertContainer';
+        container.className = 'alert-container';
+        document.body.appendChild(container);
+    }
+
     // Create alert element
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show animate-slide-in`;
@@ -622,18 +627,15 @@ function showAlert(message, type = 'info') {
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     
-    // Add to page (you might want to add a specific container)
-    const container = document.querySelector('.main-content');
-    if (container) {
-        container.insertBefore(alertDiv, container.firstChild);
-        
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 5000);
-    }
+    // Add to bottom notification stack
+    container.appendChild(alertDiv);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
 }
 
 // Escape HTML to prevent XSS (redefined here for completeness)

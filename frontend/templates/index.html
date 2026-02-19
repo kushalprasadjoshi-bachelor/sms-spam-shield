@@ -164,7 +164,7 @@
                         <i class="fas fa-robot text-primary"></i>
                         SMS Spam Shield Assistant
                     </div>
-                    <div class="message-time">Just now</div>
+                    <div class="message-time" id="welcomeMessageTime"></div>
                 </div>
                 <div class="message-text">
                     <p>Welcome to SMS Spam Shield! I can help you classify SMS messages into multiple categories:</p>
@@ -373,6 +373,13 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const welcomeMessageTime = document.getElementById('welcomeMessageTime');
+        if (welcomeMessageTime) {
+            welcomeMessageTime.textContent = typeof formatTime === 'function'
+                ? formatTime()
+                : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
         if (typeof loadModelInfo === 'function') {
             loadModelInfo();
         }
