@@ -1,0 +1,16 @@
+{
+  "feedback": [
+    {
+      "prediction_id": "mlu9zzk32vp93netmef",
+      "corrected_label": "phishing",
+      "predicted_label": "legitimate",
+      "sms": "Congratulations! You won a free iphone.",
+      "selected_models": [
+        "svm"
+      ],
+      "is_correct": false,
+      "created_at": "2026-02-20T02:34:20.080829+00:00",
+      "updated_at": "2026-02-20T02:34:20.080829+00:00"
+    }
+  ]
+}
